@@ -1,0 +1,55 @@
+body{
+    font-family: Georgia, serif;
+}
+
+.fretboard {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    border-top: 3px solid #000;
+    border-bottom: 3px solid #000;
+}
+
+.fret {
+    border-left: 5px solid #606060;
+}
+
+.fret .note{
+    height:40px;
+    text-align:center;
+    vertical-align: middle;
+    line-height: 40px;
+    font-size: 30px;
+    font-weight: bold;
+    color: blue;
+    cursor: pointer;
+
+    /*the string*/
+    background-image: linear-gradient(#a9a9a9, #a9a9a9);
+    /*background-size: 100% 2px;*/
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.string_1 {
+    background-size: 100% 2px;
+}
+
+.string_2 {
+    background-size: 100% 3px;
+}
+
+.string_3 {
+    background-size: 100% 4px;
+}
+
+.string_4 {
+    background-size: 100% 5px;
+}
+
+.string_5 {
+    background-size: 100% 6px;
+}
+
+.string_6 {
+    background-size: 100% 7px;
+}
