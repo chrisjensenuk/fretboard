@@ -1,8 +1,17 @@
 # Fretboard Trainer
-A 'what's the note?' guitar trainer in Vue.js, Typescript and WebMidi.js
+A 'what's the note?' guitar trainer in Vue.js, Typescript and Soundfont-player.js
+
+## Vision
+How the 'What's the note' trainer should work:
+1. Click a 'start training' button
+2. Note labels hidden
+3. A spot is displayed on random fret and string
+4. A configurable countdown starts
+5. When time is up. Show and play the note
+6. Wait a few seconds then goto 2)
+7. Continue until 'stop training' button is clicked
 
 ## Project setup
-
 1) Install Vue CLI
 ```
 npm install -g @vue/cli
@@ -19,8 +28,7 @@ vue create fretboard
 - Where do you prefer placing config.... - In dedicated config files
 - Save this as a preset for future projects? - N
 
-
-### Compiles and hot-reloads for development
+## host and hot-reload (HMR) for development
 ```
 npm run serve
 ```
@@ -31,3 +39,21 @@ This local web server has HMR enabled by default.
 ```
 npm run build
 ```
+
+## Libraries
+Using soundfont-player to manage the playing of the notes.
+https://github.com/danigb/soundfont-player
+
+## Todo/ideas
+- ~~Click a string and play note using sound trainer~~
+- Use Vue 3 and ditch Component Classes as already defunct
+- Add remaining frets
+- Put inlays on fret board
+- Add wood background to fretboard
+- Create 'What's the Note?' trainer configurable timeout
+- Create 'What's the Triad' trainer
+- Maybe configure the number fo frets you want to learn (specify start and end frets)
+
+
+
+
