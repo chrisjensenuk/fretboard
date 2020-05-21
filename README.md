@@ -5,9 +5,9 @@ A 'what's the note?' guitar trainer in Vue.js, Typescript and Soundfont-player.j
 How the 'What's the note' trainer should work:
 1. Click a 'start training' button
 2. Note labels hidden
-3. A spot is displayed on random fret and string
+3. A spot is displayed on random fret and string. A series of possible answer buttons are displayed below.
 4. A configurable countdown starts
-5. When time is up. Show and play the note
+5. When time is up or a answer button is clicked. Show and play the note
 6. Wait a few seconds then goto 2)
 7. Continue until 'stop training' button is clicked
 
@@ -46,13 +46,15 @@ https://github.com/danigb/soundfont-player
 
 ## Todo/ideas
 - ~~Click a string and play note using sound trainer~~
-- Use Vue 3 and ditch Component Classes as already defunct
-- Add remaining frets
-- Put inlays on fret board
+- ditch Component Classes as already defunct
+- Add Vuex
+- ~~Add remaining frets~~
+- Show open string notes differently. Add the nut?
+- ~~Put inlays on fret board~~
 - Add wood background to fretboard
 - Create 'What's the Note?' trainer configurable timeout
 - Create 'What's the Triad' trainer
-- Maybe configure the number fo frets you want to learn (specify start and end frets)
+- Maybe configure the number of frets/strings you want to learn (specify start and end frets)
 
 
 
