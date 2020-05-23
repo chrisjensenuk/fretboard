@@ -1,6 +1,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { FretData } from '@/common/Types'
+import { FretData } from '@/common/types'
+import store from '@/common/store'
 import Fret from './Fret.vue';
 import {instrument, Player} from 'soundfont-player';
 
@@ -35,6 +36,14 @@ export default class Fretboard extends Vue{
       this.guitar.play(note, this.ac.currentTime, { duration: 3})
   };
 
+  startTrainer() : void{
+    store.dispatch("startTrainer")
+  }
+
+  stopTrainer() : void{
+    store.dispatch("stopTrainer")
+  }
+
   created() : void{
 
     var self = this;
@@ -47,9 +56,18 @@ export default class Fretboard extends Vue{
 </script>
 
 <template>
+  <section>
+    <div>
+      Note Trainer:
+      <button @click="startTrainer" v-if="$store.getters.isTrainerStarted == false">Start</button>
+      <button @click="stopTrainer" v-if="$store.getters.isTrainerStarted">Stop</button>
+    </div>
+    <br><br>
+
     <div class="fretboard">
         <Fret v-for="fret in frets" :key="fret.fretNo" :fret="fret" @playNote="playNote" />
     </div>
+  </section>
 </template>
 
 <style>

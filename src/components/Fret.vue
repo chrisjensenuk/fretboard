@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { FretData } from '@/common/Types';
+import { FretData } from '@/common/types';
 import * as Soundfont from 'soundfont-player';
 
 @Component

@@ -46,10 +46,9 @@ https://github.com/danigb/soundfont-player
 
 ## Todo/ideas
 - ~~Click a string and play note using sound trainer~~
-- ditch Component Classes as already defunct
 - Add Vuex
 - ~~Add remaining frets~~
-- Show open string notes differently. Add the nut?
+- ~~Show open string notes differently. Add the nut?~~
 - ~~Put inlays on fret board~~
 - Add wood background to fretboard
 - Create 'What's the Note?' trainer configurable timeout
