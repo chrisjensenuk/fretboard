@@ -1,38 +1,46 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { FretData } from '@/common/types';
+import store from '@/common/store'
 import * as Soundfont from 'soundfont-player';
 
 @Component
 export default class Fret extends Vue {
-  @Prop() private fret!: FretData;
+  @Prop() private fretNo!: number;
+  @Prop() private fret!: Array<string>;
 
   playNote(note : string): void{
       this.$emit('playNote', note)
   }
 
-  displayNote(note : string) : string {
+  noteText(note : string) : string {
+    if(store.getters.isTrainerStarted){
+      if(store.state.answerNote == note){
+        return "X";
+      }
+      return "";
+    }
+
     return note.replace('5', '').replace('4', '').replace('3', '').replace('2', '').replace('1', '');
   }
 
   fretClass() {
       return {
         fret : true,
-        singleInlay : [3,5,7,9].indexOf(this.fret.fretNo) > -1,
-        doubleInlay : this.fret.fretNo == 12
+        singleInlay : [3,5,7,9].indexOf(this.fretNo) > -1,
+        doubleInlay : this.fretNo == 12
       };
   }
 }
 </script>
 
 <template>
-  <div :id="'fret_' + fret.fretNo" :class="fretClass()">
-    <div class="note string_1" @click="playNote(fret.string1)">{{displayNote(fret.string1)}}</div>
-    <div class="note string_2" @click="playNote(fret.string2)">{{displayNote(fret.string2)}}</div>
-    <div class="note string_3" @click="playNote(fret.string3)">{{displayNote(fret.string3)}}</div>
-    <div class="note string_4" @click="playNote(fret.string4)">{{displayNote(fret.string4)}}</div>
-    <div class="note string_5" @click="playNote(fret.string5)">{{displayNote(fret.string5)}}</div>
-    <div class="note string_6" @click="playNote(fret.string6)">{{displayNote(fret.string6)}}</div>
+  <div :id="'fret_' + fretNo" :class="fretClass()">
+    <div class="note string_1" @click="playNote(fret[0])">{{noteText(fret[0])}}</div>
+    <div class="note string_2" @click="playNote(fret[1])">{{noteText(fret[1])}}</div>
+    <div class="note string_3" @click="playNote(fret[2])">{{noteText(fret[2])}}</div>
+    <div class="note string_4" @click="playNote(fret[3])">{{noteText(fret[3])}}</div>
+    <div class="note string_5" @click="playNote(fret[4])">{{noteText(fret[4])}}</div>
+    <div class="note string_6" @click="playNote(fret[5])">{{noteText(fret[5])}}</div>
   </div>
 </template>
 

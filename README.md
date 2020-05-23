@@ -50,9 +50,11 @@ https://github.com/danigb/soundfont-player
 - ~~Add remaining frets~~
 - ~~Show open string notes differently. Add the nut?~~
 - ~~Put inlays on fret board~~
-- Add wood background to fretboard
+- Use a dot instead of an X to guess the note
+- Add wood background to fretboard?
 - Create 'What's the Note?' trainer configurable timeout
 - Create 'What's the Triad' trainer
+- Create a 'Listen to the Note' trainre.  Note is played and the correct string/fret needs to be clicked
 - Maybe configure the number of frets/strings you want to learn (specify start and end frets)
 
 

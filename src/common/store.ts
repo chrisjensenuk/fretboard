@@ -8,29 +8,40 @@ enum TrainerState {
     Started
 }
 
+
 export default new Vuex.Store({
     state: {
-        trainerState: TrainerState.Stopped
+        trainerState: TrainerState.Stopped,
+        answerNote!: null as null | string
     },
 
     mutations: {
-        CHANGE_TRAINER_STATE(state, trainerState){
+        SET_TRAINER_STATE(state, trainerState){
             state.trainerState = trainerState;
+        },
+
+        SET_ANSWER_NOTE(state, answerNote : string){
+            state.answerNote = answerNote;
         }
     },
 
     actions: {
         startTrainer(context){
-            context.commit('CHANGE_TRAINER_STATE', TrainerState.Started)
+            context.commit('SET_TRAINER_STATE', TrainerState.Started);
         },
+
         stopTrainer(context){
-            context.commit('CHANGE_TRAINER_STATE', TrainerState.Stopped)
+            context.commit('SET_TRAINER_STATE', TrainerState.Stopped);
+        },
+
+        setAnswerNote(context, answerNote : string){
+            context.commit('SET_ANSWER_NOTE', answerNote);
         }
     },
 
     getters: {
         isTrainerStarted: state => {
             return state.trainerState == TrainerState.Started;
-        }    
+        }
     }
 })
