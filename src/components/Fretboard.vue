@@ -10,6 +10,11 @@ import noteTrainer from '@/application/noteTrainer';
 @Component({
   components: {
     Fret
+  },
+  filters:{
+    timerFilter(value : number){
+      return value / 1000
+    }
   }
 })
 export default class Fretboard extends Vue{
@@ -48,6 +53,7 @@ export default class Fretboard extends Vue{
       Note Trainer:
       <button @click="startTrainer" v-if="$store.getters.isTrainerStarted == false">Start</button>
       <button @click="stopTrainer" v-if="$store.getters.isTrainerStarted">Stop</button>
+      <div>Time: {{ $store.state.trainerTimer | timerFilter }}</div>
     </div>
     <br><br>
 

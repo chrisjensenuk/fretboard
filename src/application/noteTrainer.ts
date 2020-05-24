@@ -1,10 +1,12 @@
-import store from '@/common/store'
+import store, {NoteData} from '@/common/store'
 import { fretData } from '@/common/fretData'
+
+var noteTrainerInterval : number = 0;
 
 class NoteTrainer {
 
     constructor(){
-        store.watch((state) => store.state.trainerState,
+        store.watch((state) => state.trainerState,
         (oldValue, newValue) => {
             console.log("watch: oldValue:" + oldValue + ' newValue:' + newValue)
         })
@@ -28,28 +30,38 @@ class NoteTrainer {
         //todo: wait for the answer button click
 
         //todo: show how long it took, if correct, play the note and dispaly the note
+        
+        var timerInterval = 100;
+        store.dispatch("clearTrainerTimer")
 
-        setTimeout(function(){
-            console.log("stopping trainer");
-            store.dispatch("stopTrainer");
-        },1000);
+        noteTrainerInterval = setInterval(function(){
+            if(store.getters.isTrainerStarted == false){
+                clearInterval(noteTrainerInterval);
+            }
+            else{
+                store.dispatch("addTrainerTimer", timerInterval)
+            }
+        }, timerInterval)
     }
 
-    getRandomNote() : string{
+    getRandomNote() : NoteData {
         let randomFretNo = rand(0, fretData.length - 1);
         let fret = fretData[randomFretNo];
-        let randomString = rand(0, fret.length - 1);
-        let note = fret[randomString];
+        let randomStringNo = rand(0, fret.length - 1);
+        let randomNote = fret[randomStringNo];
+        
+        let noteData : NoteData = {
+            fretNo : randomFretNo,
+            stringNo : randomStringNo,
+            note : randomNote
+        };
 
-        if(note === undefined)
-        {
-            debugger;
-        }
-
-        return note;
+        return noteData;
     }
 
 }
+
+
 
 function rand(min: number, max: number): number {
     return (Math.random() * (max - min + 1) | 0) + min;

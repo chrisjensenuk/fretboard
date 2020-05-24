@@ -8,11 +8,17 @@ enum TrainerState {
     Started
 }
 
+export interface NoteData{
+    fretNo : number,
+    stringNo: number,
+    note: string
+}
 
 export default new Vuex.Store({
     state: {
         trainerState: TrainerState.Stopped,
-        answerNote!: null as null | string
+        answerNote!: null as null | NoteData,
+        trainerTimer: 0 as number
     },
 
     mutations: {
@@ -20,8 +26,12 @@ export default new Vuex.Store({
             state.trainerState = trainerState;
         },
 
-        SET_ANSWER_NOTE(state, answerNote : string){
+        SET_ANSWER_NOTE(state, answerNote : NoteData){
             state.answerNote = answerNote;
+        },
+
+        SET_TRAINER_TIMER(state, trainerTimer : number){
+            state.trainerTimer = trainerTimer;
         }
     },
 
@@ -34,8 +44,16 @@ export default new Vuex.Store({
             context.commit('SET_TRAINER_STATE', TrainerState.Stopped);
         },
 
-        setAnswerNote(context, answerNote : string){
+        setAnswerNote(context, answerNote : NoteData){
             context.commit('SET_ANSWER_NOTE', answerNote);
+        },
+
+        clearTrainerTimer(context){
+            context.commit('SET_TRAINER_TIMER', 0);
+        },
+        
+        addTrainerTimer(context, trainerTimer : number){
+            context.commit('SET_TRAINER_TIMER', context.state.trainerTimer + trainerTimer);
         }
     },
 
