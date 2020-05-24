@@ -18,11 +18,29 @@ class NoteTrainer {
 
         //todo: randomly get a note
         var answerNote = this.getRandomNote();
-
-        console.log("random note:" + answerNote);
-
+        console.log("random note:" + answerNote.note);
         store.dispatch("setAnswerNote", answerNote);
 
+        //set answer options. 1 correct and 4 random options
+        var answerOptions = [answerNote] as Array<NoteData>;
+        while(answerOptions.length <= 5){
+            let randomAnswer = this.getRandomNote();
+            
+            //make sure answer choices are unique
+            let alreadyAdded = answerOptions.some(function(el){
+                return el.note.replace(/[1-5]/g, '') == randomAnswer.note.replace(/[1-5]/g, ''); 
+            });
+            if(!alreadyAdded){
+                answerOptions.push(randomAnswer);
+            }
+        }
+        //sort answers
+        answerOptions = answerOptions.sort(function(n1,n2){
+            return (n1.note < n2.note) ? -1 : (n1.note > n2.note) ? 1 : 0;
+        })
+        store.dispatch("setAnswerOptions", answerOptions);
+
+    
         //todo: mark the position of the note on the fretboard
 
         //todo: set the answer buttons to 4 random + noteToGuess

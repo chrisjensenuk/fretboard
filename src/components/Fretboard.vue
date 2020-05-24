@@ -36,8 +36,11 @@ export default class Fretboard extends Vue{
     store.dispatch("stopTrainer")
   }
 
-  created() : void{
+  selectedAnswer() : void{
+    alert("to do!");
+  }
 
+  created() : void{
     var self = this;
     
     instrument(this.ac, 'acoustic_guitar_steel', {gain : 5}).then(function (guitar : any) {
@@ -59,6 +62,14 @@ export default class Fretboard extends Vue{
 
     <div class="fretboard">
         <Fret v-for="(fret, index) in frets" :key="index" :fret="fret" :fretNo="index" @playNote="playNote" />
+    </div>
+
+    <div v-if="$store.state.answerOptions != null" class="answer-buttons">
+      <button @click="selectedAnswer($store.state.answerOptions[0])" class="answer-button">{{ $store.state.answerOptions[0].note | noteFilter }}</button>
+      <button @click="selectedAnswer($store.state.answerOptions[1])" class="answer-button">{{ $store.state.answerOptions[1].note | noteFilter }}</button>
+      <button @click="selectedAnswer($store.state.answerOptions[2])" class="answer-button">{{ $store.state.answerOptions[2].note | noteFilter }}</button>
+      <button @click="selectedAnswer($store.state.answerOptions[3])" class="answer-button">{{ $store.state.answerOptions[3].note | noteFilter }}</button>
+      <button @click="selectedAnswer($store.state.answerOptions[4])" class="answer-button">{{ $store.state.answerOptions[4].note | noteFilter }}</button>
     </div>
   </section>
 </template>

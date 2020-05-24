@@ -18,7 +18,8 @@ export default new Vuex.Store({
     state: {
         trainerState: TrainerState.Stopped,
         answerNote!: null as null | NoteData,
-        trainerTimer: 0 as number
+        trainerTimer: 0 as number,
+        answerOptions: null as null | Array<NoteData>
     },
 
     mutations: {
@@ -32,6 +33,10 @@ export default new Vuex.Store({
 
         SET_TRAINER_TIMER(state, trainerTimer : number){
             state.trainerTimer = trainerTimer;
+        },
+
+        SET_ANSWER_OPTIONS(state, answerOptions : Array<NoteData>){
+            state.answerOptions = answerOptions;
         }
     },
 
@@ -54,6 +59,10 @@ export default new Vuex.Store({
         
         addTrainerTimer(context, trainerTimer : number){
             context.commit('SET_TRAINER_TIMER', context.state.trainerTimer + trainerTimer);
+        },
+
+        setAnswerOptions(context, answerOptions : Array<NoteData>){
+            context.commit('SET_ANSWER_OPTIONS', answerOptions);
         }
     },
 

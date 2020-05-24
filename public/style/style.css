@@ -78,3 +78,13 @@ body{
 #fret_0 .note{
     background: none;
 }
+
+.answer-buttons{
+    text-align: center;
+}
+
+.answer-button{
+    margin:10px;
+    width:100px;
+    font-size:50px;
+}
