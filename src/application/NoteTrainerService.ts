@@ -12,15 +12,16 @@ const timerInterval = 100 as number;
 class NoteTrainerService {
 
     //callback functions to be overridden by calling class
-    stateChanged: (state: TrainerState) => void
-    answerNoteChanged: (note: NoteData) => void
-    answerOptionsChanged: (answerOptions: Array<NoteData>) => void
+    stateChanged: (state: TrainerState) => void;
+    answerNoteChanged: (note: NoteData) => void;
+    answerOptionsChanged: (answerOptions: Array<NoteData>) => void;
     timerChanged: (time: number) => void;
+    getAnswerNote: () => NoteData | null;
 
     static readonly timerInterval = 100 as number;
 
     private noteTrainerInterval : number = 0;
-    private state: TrainerState;
+    private trainerState: TrainerState;
 
     constructor(){
         //terminate callbacks that are expected to be overridden
@@ -28,8 +29,9 @@ class NoteTrainerService {
         this.answerNoteChanged = () => {};
         this.answerOptionsChanged = () => {};
         this.timerChanged = () => {};
+        this.getAnswerNote = () => null;
 
-        this.state = TrainerState.Stopped;
+        this.trainerState = TrainerState.Stopped;
     }
     
     start() : void{
@@ -44,7 +46,7 @@ class NoteTrainerService {
 
         //set answer options. 1 correct and 4 random options
         var answerOptions = [answerNote] as Array<NoteData>;
-        while(answerOptions.length <= 5){
+        while(answerOptions.length < 5){
             let randomAnswer = self.getRandomNote();
             
             //make sure answer choices are unique
@@ -67,8 +69,8 @@ class NoteTrainerService {
         var timer = 0;
         this.timerChanged(timer);
 
-        this.state = TrainerState.Started;
-        this.stateChanged(this.state);
+        this.trainerState = TrainerState.Started;
+        this.stateChanged(this.trainerState);
 
         this.noteTrainerInterval = setInterval(function(){
             timer += timerInterval;
@@ -77,10 +79,27 @@ class NoteTrainerService {
     }
 
     stop(): void{
-        this.state = TrainerState.Stopped;
-        this.stateChanged(this.state);
+        this.trainerState = TrainerState.Stopped;
+        this.stateChanged(this.trainerState);
 
         clearInterval(this.noteTrainerInterval);
+    }
+
+    selectAnswer(guessedNote: NoteData){
+        //is the answer correct?
+        if(guessedNote == this.getAnswerNote()){
+            alert("correct!");
+
+            //log correct guess and time time
+
+            //do a hurrah!
+
+            //go get the next note
+        }
+        else{
+          //try again
+          alert("try again");
+        }
     }
 
     private getRandomNote() : NoteData {

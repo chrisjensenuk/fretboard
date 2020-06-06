@@ -1,24 +1,32 @@
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
 import store from '@/common/store';
 import * as Soundfont from 'soundfont-player';
-import {NoteData} from '@/common/models';
+import { NoteData } from '@/common/models';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
-@Component
+@Component({
+  computed: {
+    ...mapGetters(['isTrainerStarted']),
+    ...mapState(['answerNote'])
+  }
+})
 export default class Fret extends Vue {
   @Prop() private fretNo!: number;
   @Prop() private fret!: Array<string>;
 
-  playNote(note : string): void{
-      this.$emit('playNote', note)
+  @Emit()
+  playNote(note : string){
+    return note;
   }
 
+  isTrainerStarted?: boolean;
+  answerNote?: NoteData;
+
   noteText(fret : Array<string>, fretNo : number, stringNo : number) : string {
-    if(store.getters.isTrainerStarted){
+    if(this.isTrainerStarted){
       
-      let answerNote = store.state.answerNote;
-      if(answerNote != null && answerNote.fretNo == fretNo && answerNote.stringNo == stringNo)
-      {
+      if(this.answerNote != null && this.answerNote.fretNo == fretNo && this.answerNote.stringNo == stringNo){
         return "X";
       }
 
