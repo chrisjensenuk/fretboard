@@ -46,17 +46,24 @@ https://github.com/danigb/soundfont-player
 
 ## Todo/ideas
 - ~~Click a string and play note using sound trainer~~
-- Add Vuex
+- ~~Add Vuex~~
 - ~~Add remaining frets~~
 - ~~Show open string notes differently. Add the nut?~~
 - ~~Put inlays on fret board~~
+- Add Tests
 - Use a dot instead of an X to guess the note
 - Add wood background to fretboard?
 - Create 'What's the Note?' trainer configurable timeout
 - Create 'What's the Triad' trainer
 - Create a 'Listen to the Note' trainre.  Note is played and the correct string/fret needs to be clicked
 - Maybe configure the number of frets/strings you want to learn (specify start and end frets)
+- Record length of time take to click a button and whether successful or not. Record datetime too.
+- Create heat map of correct/incorrect based on time taken
+- Save timings to Azure? - logic app? table storage? what's cheapest?
+- View 'sessions' and improvement over time
 
-
+## Bugs/Fixes
+- answer button ordering is off - currently D# comes before D
+- need to run a separate stopwatch rather than relying on the interval to determine the time taken as code inside the interval lambda pauses the interval.
 
 

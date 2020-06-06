@@ -1,7 +1,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import store, {NoteData} from '@/common/store'
+import store from '@/common/store';
 import * as Soundfont from 'soundfont-player';
+import {NoteData} from '@/common/models';
 
 @Component
 export default class Fret extends Vue {

@@ -1,10 +1,10 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import { fretData } from '@/common/fretData'
 import store from '@/common/store'
 import Fret from './Fret.vue';
 import {instrument, Player} from 'soundfont-player';
-import noteTrainer from '@/application/noteTrainer';
+import {NoteData, fretData} from '@/common/models';
+import { mapActions } from 'vuex';
 
 
 @Component({
@@ -15,6 +15,9 @@ import noteTrainer from '@/application/noteTrainer';
     timerFilter(value : number){
       return value / 1000
     }
+  },
+  methods: {
+    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer'])
   }
 })
 export default class Fretboard extends Vue{
@@ -27,19 +30,7 @@ export default class Fretboard extends Vue{
     if(this.guitar != null)
       this.guitar.play(note, this.ac.currentTime, { duration: 3})
   };
-
-  startTrainer() : void{
-    noteTrainer.run();
-  }
-
-  stopTrainer() : void{
-    store.dispatch("stopTrainer")
-  }
-
-  selectedAnswer() : void{
-    alert("to do!");
-  }
-
+  
   created() : void{
     var self = this;
     
@@ -65,11 +56,11 @@ export default class Fretboard extends Vue{
     </div>
 
     <div v-if="$store.state.answerOptions != null" class="answer-buttons">
-      <button @click="selectedAnswer($store.state.answerOptions[0])" class="answer-button">{{ $store.state.answerOptions[0].note | noteFilter }}</button>
-      <button @click="selectedAnswer($store.state.answerOptions[1])" class="answer-button">{{ $store.state.answerOptions[1].note | noteFilter }}</button>
-      <button @click="selectedAnswer($store.state.answerOptions[2])" class="answer-button">{{ $store.state.answerOptions[2].note | noteFilter }}</button>
-      <button @click="selectedAnswer($store.state.answerOptions[3])" class="answer-button">{{ $store.state.answerOptions[3].note | noteFilter }}</button>
-      <button @click="selectedAnswer($store.state.answerOptions[4])" class="answer-button">{{ $store.state.answerOptions[4].note | noteFilter }}</button>
+      <button @click="selectAnswer($store.state.answerOptions[0])" class="answer-button">{{ $store.state.answerOptions[0].note | noteFilter }}</button>
+      <button @click="selectAnswer($store.state.answerOptions[1])" class="answer-button">{{ $store.state.answerOptions[1].note | noteFilter }}</button>
+      <button @click="selectAnswer($store.state.answerOptions[2])" class="answer-button">{{ $store.state.answerOptions[2].note | noteFilter }}</button>
+      <button @click="selectAnswer($store.state.answerOptions[3])" class="answer-button">{{ $store.state.answerOptions[3].note | noteFilter }}</button>
+      <button @click="selectAnswer($store.state.answerOptions[4])" class="answer-button">{{ $store.state.answerOptions[4].note | noteFilter }}</button>
     </div>
   </section>
 </template>

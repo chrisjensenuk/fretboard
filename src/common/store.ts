@@ -1,20 +1,11 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {NoteData, TrainerState} from '@/common/models'
+import NoteTrainerService from '@/application/NoteTrainerService'
 
 Vue.use(Vuex)
 
-enum TrainerState {
-    Stopped,
-    Started
-}
-
-export interface NoteData{
-    fretNo : number,
-    stringNo: number,
-    note: string
-}
-
-export default new Vuex.Store({
+const store = new Vuex.Store({
     state: {
         trainerState: TrainerState.Stopped,
         answerNote!: null as null | NoteData,
@@ -41,26 +32,31 @@ export default new Vuex.Store({
     },
 
     actions: {
+
         startTrainer(context){
-            context.commit('SET_TRAINER_STATE', TrainerState.Started);
+            NoteTrainerService.start();
         },
 
         stopTrainer(context){
-            context.commit('SET_TRAINER_STATE', TrainerState.Stopped);
+            NoteTrainerService.stop();
+        },
+
+        selectAnswer(context, note : NoteData){
+            alert(note.note + " TODO!");
+        },
+
+        setTrainerState(context, state: TrainerState){
+            context.commit('SET_TRAINER_STATE', state);
         },
 
         setAnswerNote(context, answerNote : NoteData){
             context.commit('SET_ANSWER_NOTE', answerNote);
         },
 
-        clearTrainerTimer(context){
-            context.commit('SET_TRAINER_TIMER', 0);
+        setTrainerTimer(context, time: number){
+            context.commit('SET_TRAINER_TIMER', time);
         },
         
-        addTrainerTimer(context, trainerTimer : number){
-            context.commit('SET_TRAINER_TIMER', context.state.trainerTimer + trainerTimer);
-        },
-
         setAnswerOptions(context, answerOptions : Array<NoteData>){
             context.commit('SET_ANSWER_OPTIONS', answerOptions);
         }
@@ -71,4 +67,12 @@ export default new Vuex.Store({
             return state.trainerState == TrainerState.Started;
         }
     }
-})
+});
+
+//hooking up callbacks from service
+NoteTrainerService.stateChanged = (trainerState: TrainerState) => store.dispatch("setTrainerState", trainerState)
+NoteTrainerService.answerNoteChanged = (answerNote: NoteData) => store.dispatch("setAnswerNote", answerNote);
+NoteTrainerService.answerOptionsChanged = (answerOptions: Array<NoteData>) => store.dispatch("setAnswerOptions", answerOptions);
+NoteTrainerService.timerChanged = (timer: number) => store.dispatch("setTrainerTimer", timer);
+
+export default store;
