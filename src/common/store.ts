@@ -42,7 +42,7 @@ const store = new Vuex.Store({
         },
 
         selectAnswer(context, note : NoteData){
-            NoteTrainerService.selectAnswer(note);
+            NoteTrainerService.selectAnswer(note, context.state.answerNote);
         },
 
         setTrainerState(context, state: TrainerState){
@@ -74,6 +74,5 @@ NoteTrainerService.stateChanged = (trainerState: TrainerState) => store.dispatch
 NoteTrainerService.answerNoteChanged = (answerNote: NoteData) => store.dispatch("setAnswerNote", answerNote);
 NoteTrainerService.answerOptionsChanged = (answerOptions: Array<NoteData>) => store.dispatch("setAnswerOptions", answerOptions);
 NoteTrainerService.timerChanged = (timer: number) => store.dispatch("setTrainerTimer", timer);
-NoteTrainerService.getAnswerNote = () => store.state.answerNote;
 
 export default store;
