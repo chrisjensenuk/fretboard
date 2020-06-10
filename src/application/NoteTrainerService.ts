@@ -16,6 +16,7 @@ class NoteTrainerService {
     answerNoteChanged: (note: NoteData) => void;
     answerOptionsChanged: (answerOptions: Array<NoteData>) => void;
     timerChanged: (time: number) => void;
+    saveGuess:() => void;
 
     static readonly timerInterval = 100 as number;
 
@@ -28,6 +29,7 @@ class NoteTrainerService {
         this.answerNoteChanged = () => {};
         this.answerOptionsChanged = () => {};
         this.timerChanged = () => {};
+        this.saveGuess = () => {};
 
         this.trainerState = TrainerState.Stopped;
     }
@@ -84,11 +86,14 @@ class NoteTrainerService {
     }
 
     selectAnswer(guessedNote: NoteData, correctNote: NoteData | null){
+        this.saveGuess();
+        
         //is the answer correct?
         if(guessedNote == correctNote){
             alert("correct!");
 
             //log correct guess and time time and number of attempts
+            
 
             //do a hurrah!
 

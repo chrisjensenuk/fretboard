@@ -50,6 +50,8 @@ https://vuex.vuejs.org/
 https://class-component.vuejs.org/  
 [vue-class-component github documentation](https://github.com/vuejs/vue-class-component)  
 [vue-property-decorator github documentation](https://github.com/kaorun343/vue-property-decorator)  
+[vuex-module-decorators](https://github.com/championswimmer/vuex-module-decorators)  
+https://github.com/championswimmer/vuex-module-decorators/blob/master/docs/pages/core/actions.md  
 
 ## Libraries
 Using soundfont-player to manage the playing of the notes.
@@ -74,6 +76,7 @@ https://github.com/danigb/soundfont-player
 - Create heat map of correct/incorrect based on time taken
 - Save timings to Azure? - logic app? table storage? what's cheapest?
 - View 'sessions' and improvement over time
+- Log javascript to AppInsights
 
 ## Bugs/Fixes
 - answer button ordering is off - currently D# comes before D
@@ -101,5 +104,8 @@ https://stackoverflow.com/questions/56430002/authenticate-users-to-azure-functio
 https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-auth-aad
 
 https://blog.powney.info/2019/05/add-oauth-implicit-flow-to-azure-function
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-acquire-token?tabs=javascript
+
 
 Can't use msal.js 2.0 as B2C doesn't support it yet.

@@ -18,11 +18,11 @@ import * as Msal from 'msal'
     }
   },
   methods: {
-    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer'])
+    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer', 'login'])
     },
   computed: {
-    ...mapGetters(['isTrainerStarted']),
-    ...mapState(['trainerTimer', 'answerOptions'])
+    ...mapGetters(['isTrainerStarted', 'getLoginName', 'getLoginError']),
+    ...mapState(['trainerTimer', 'answerOptions']),
     },
 
 })
@@ -31,19 +31,6 @@ export default class Fretboard extends Vue{
   private guitar !: Player;
 
   private frets = fretData;
-
-  private readonly msalLogin = new Msal.UserAgentApplication({
-    auth:{
-      clientId: "282a71eb-8a1f-4aed-a41e-920bafb38ff3",
-      redirectUri: "https://localhost:8080/",
-      postLogoutRedirectUri: "https://localhost:8080/",
-      authority: "https://login.microsoftonline.com/a061aca6-27f7-48ab-81c8-172f7bc9f4e9"
-    }
-  });
-
-  private readonly loginRequest = {
-    scopes: ["User.ReadWrite", "https://fn-fretboard.azurewebsites.net/user_impersonation"]
-  } as Msal.AuthenticationParameters;
 
   created() : void{
     var self = this;
@@ -58,30 +45,36 @@ export default class Fretboard extends Vue{
       this.guitar.play(note, this.ac.currentTime, { duration: 3})
   };
 
-  login(): void{
+  login_tmp(): void{
     var self = this;
 
-    var auth = this.msalLogin.loginPopup(this.loginRequest)
+    let msalLogin = new Msal.UserAgentApplication({
+      auth:{
+        clientId: "95f851f6-de0f-4dae-9d39-4b0fc90dc6b1",
+        redirectUri: "https://localhost:8080/",
+        postLogoutRedirectUri: "https://localhost:8080/",
+        authority: "https://login.microsoftonline.com/a061aca6-27f7-48ab-81c8-172f7bc9f4e9"
+      }
+    });
+
+    var auth = msalLogin.loginPopup({
+    scopes: ["User.ReadWrite", "https://fn-fretboard2.azurewebsites.net/user_impersonation"]
+    })
     .then(function(loginResponse){
       //login success
       
-      self.msalLogin.acquireTokenSilent({
-        scopes: ["https://fn-fretboard.azurewebsites.net/user_impersonation"]
+      msalLogin.acquireTokenSilent({
+        scopes: ["https://fn-fretboard2.azurewebsites.net/user_impersonation"]
       })
       .then(function(accessTokenResponse){
         let accessToken = accessTokenResponse.accessToken;
         debugger;
       })
-
     }).catch(function (error) {
       //login failure
       console.log(error);
       debugger;
     });
-  }
-
-  logout(): void {
-    this.msalLogin.logout();
   }
 }
 </script>
@@ -90,7 +83,8 @@ export default class Fretboard extends Vue{
   <section>
     <div>
       <button @click="login">Login</button>
-      <button @click="logout">Log out</button>
+      <h2 v-if="getLoginName">Hi {{ getLoginName }}!</h2>
+      <div v-if="getLoginError">{{ getLoginError }}</div>
     </div>
     <div>
       Note Trainer:

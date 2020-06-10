@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {NoteData, TrainerState} from '@/common/models'
 import NoteTrainerService from '@/application/NoteTrainerService'
+import storeBackend from '@/common/storeBackend'
 
 Vue.use(Vuex)
 
@@ -10,7 +11,11 @@ const store = new Vuex.Store({
         trainerState: TrainerState.Stopped,
         answerNote!: null as null | NoteData,
         trainerTimer: 0 as number,
-        answerOptions: null as null | Array<NoteData>
+        answerOptions: null as null | Array<NoteData>,
+    },
+
+    modules:{
+        storeBackend
     },
 
     mutations: {
@@ -63,9 +68,7 @@ const store = new Vuex.Store({
     },
 
     getters: {
-        isTrainerStarted: state => {
-            return state.trainerState == TrainerState.Started;
-        }
+        isTrainerStarted: state => state.trainerState == TrainerState.Started
     }
 });
 
@@ -74,5 +77,6 @@ NoteTrainerService.stateChanged = (trainerState: TrainerState) => store.dispatch
 NoteTrainerService.answerNoteChanged = (answerNote: NoteData) => store.dispatch("setAnswerNote", answerNote);
 NoteTrainerService.answerOptionsChanged = (answerOptions: Array<NoteData>) => store.dispatch("setAnswerOptions", answerOptions);
 NoteTrainerService.timerChanged = (timer: number) => store.dispatch("setTrainerTimer", timer);
+NoteTrainerService.saveGuess = () => store.dispatch("saveGuess", null);
 
 export default store;
