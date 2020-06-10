@@ -1,5 +1,7 @@
 # Fretboard Trainer
-A 'what's the note?' guitar trainer in Vue.js, Typescript and Soundfont-player.js
+A 'what's the note?' guitar trainer in Vue.js, Typescript and Soundfont-player.js.
+
+JAMstack architecture using Azure Functions for backend work.
 
 ## Vision
 How the 'What's the note' trainer should work:
@@ -40,6 +42,9 @@ This local web server has HMR enabled by default.
 npm run build
 ```
 
+## Authentication
+[documentation regarding configuration of authentication](/docs/authentication)
+
 ## resources
 https://vuex.vuejs.org/  
 https://class-component.vuejs.org/  
@@ -58,6 +63,7 @@ https://github.com/danigb/soundfont-player
 - ~~Put inlays on fret board~~
 - Add Tests
 - Add linting on build
+- Create resources in Azure 'UK South' (As UK West doesn't do appInsights)
 - Use a dot instead of an X to guess the note
 - Add wood background to fretboard?
 - Create 'What's the Note?' trainer configurable timeout
@@ -73,4 +79,27 @@ https://github.com/danigb/soundfont-player
 - answer button ordering is off - currently D# comes before D
 - need to run a separate stopwatch rather than relying on the interval to determine the time taken as code inside the interval lambda pauses the interval.
 
+## Authentication
 
+Goal: 
+- I want users to sign up by themselves so I want to use Azure AD B2C
+- I want users to sign in over javascript (MSAL.js)
+- I want users to be authenticated in the Function app
+
+https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-single-page-app?tabs=app-reg-ga  
+
+https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-single-page-app-webapi?tabs=app-reg-ga%2Capp-reg-preview
+
+https://medium.com/@smartdeveloper/azure-functions-rest-api-security-with-msal-and-azure-ad-c9cd75d3316e
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-overview
+
+https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-b2c-overview
+
+https://stackoverflow.com/questions/56430002/authenticate-users-to-azure-function-when-user-is-authenticated-in-web-app
+
+https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-auth-aad
+
+https://blog.powney.info/2019/05/add-oauth-implicit-flow-to-azure-function
+
+Can't use msal.js 2.0 as B2C doesn't support it yet.

@@ -83,7 +83,7 @@ class NoteTrainerService {
         clearInterval(this.noteTrainerInterval);
     }
 
-    selectAnswer(guessedNote: NoteData, correctNote?: NoteData){
+    selectAnswer(guessedNote: NoteData, correctNote: NoteData | null){
         //is the answer correct?
         if(guessedNote == correctNote){
             alert("correct!");

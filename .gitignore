@@ -22,3 +22,4 @@ yarn-error.log*
 
 /.vs
 /dotnetsrc/Fretboard/.vs/Fretboard
+*.pubxml
