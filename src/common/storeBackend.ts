@@ -65,7 +65,7 @@ export default class storeBackend extends VuexModule{
 
         let self = this;
         
-        var accessToken = await getToken(self.context.dispatch("doLogin"));
+        var accessToken = await getToken(self.context.dispatch("login"));
         
         alert(accessToken);
 
