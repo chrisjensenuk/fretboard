@@ -43,10 +43,10 @@ npm run build
 ```
 
 ## Architecture and Deployment
-[documentation regarding the architecture and eployment via ARM Templates and scripting](docs/architecture)
+[documentation regarding the architecture and eployment via ARM Templates and scripting](docs/architecture.md)
 
 ## Authentication
-[documentation regarding configuration of authentication](/docs/authentication)
+[documentation regarding configuration of authentication](/docs/authentication.md)
 
 ## Resources
 https://vuex.vuejs.org/  
