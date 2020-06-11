@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Linq;
+using System;
 
 namespace FretboardFunctions
 {
@@ -21,7 +22,7 @@ namespace FretboardFunctions
             var isAuthenticated = claimsPrincipal.Identity.IsAuthenticated ? "Authenticated" : "Not authenticated";
             var claims = string.Join(" | ", claimsPrincipal.Claims.Select(c => $"{c.Type}={c.Value}|"));
 
-            var response = $"{ isAuthenticated} :: {claims}";
+            var response = $"{DateTime.Now:o} :: { isAuthenticated} :: {claims}";
             
             return new OkObjectResult(response);
         }

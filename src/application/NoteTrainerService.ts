@@ -90,7 +90,7 @@ class NoteTrainerService {
         
         //is the answer correct?
         if(guessedNote == correctNote){
-            alert("correct!");
+            console.log("correct!");
 
             //log correct guess and time time and number of attempts
             
@@ -103,7 +103,7 @@ class NoteTrainerService {
         }
         else{
           //try again
-          alert("try again");
+          console.log("try again");
         }
     }
 

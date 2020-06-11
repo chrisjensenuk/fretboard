@@ -4,9 +4,9 @@ import axios from 'axios';
 
 let msalLogin = new Msal.UserAgentApplication({
     auth:{
-        clientId: "95f851f6-de0f-4dae-9d39-4b0fc90dc6b1",
-        redirectUri: "https://localhost:8080/",
-        postLogoutRedirectUri: "https://localhost:8080/",
+        clientId: "4ac362b9-645c-4ffe-b052-327706af7e5a",
+        redirectUri: "https://stfretboard.z33.web.core.windows.net/",
+        postLogoutRedirectUri: "https://stfretboard.z33.web.core.windows.net/",
         authority: "https://login.microsoftonline.com/a061aca6-27f7-48ab-81c8-172f7bc9f4e9"
     }
 });
@@ -17,6 +17,7 @@ export default class storeBackend extends VuexModule{
     isAuthenticated = false;
     loginError = "";
     loginName = "";
+    response = "";
 
     get getLoginName(){
         return this.loginName;
@@ -24,6 +25,10 @@ export default class storeBackend extends VuexModule{
 
     get getLoginError(){
         return this.loginError;
+    }
+
+    get getResponse(){
+        return this.response;
     }
 
     @Mutation
@@ -41,12 +46,19 @@ export default class storeBackend extends VuexModule{
         this.isAuthenticated = isAuthenticated;
     }
 
+    @Mutation
+    SET_RESPONSE(response: string){
+        this.response = response;
+    }
+
     @Action
     async login(){
         var self = this;
           
         await msalLogin.loginPopup({
-        scopes: ["User.ReadWrite", "https://fn-fretboard2.azurewebsites.net/user_impersonation"]
+        scopes: ["User.ReadWrite", "https://fn-fretboard.azurewebsites.net/user_impersonation"],
+        prompt: "select_account",
+        loginHint: ""
         })
         .then(function(loginResponse){            
             self.context.commit('LOGIN_ERROR', "");
@@ -67,13 +79,11 @@ export default class storeBackend extends VuexModule{
         
         var accessToken = await getToken(self.context.dispatch("login"));
         
-        alert(accessToken);
-
-        axios.get("https://fn-fretboard2.azurewebsites.net/api/HttpTrigger1", {
+        axios.get("https://fn-fretboard.azurewebsites.net/api/test", {
             headers: { Authorization: `Bearer ${accessToken}` }
         })
         .then(function(response){
-            debugger;
+            self.context.commit('SET_RESPONSE', response.data)
         })
         .catch(function(error){
             debugger;
@@ -85,10 +95,9 @@ async function getToken(funcLogin : any) : Promise<string>{
     let accessToken = "" as string;
 
     await msalLogin.acquireTokenSilent({
-        scopes: ["https://fn-fretboard2.azurewebsites.net/user_impersonation"]
+        scopes: ["https://fn-fretboard.azurewebsites.net/user_impersonation"]
         })
         .then(function(accessTokenResponse){
-            debugger;
             accessToken = accessTokenResponse.accessToken;
         })
         .catch(async function (error) {
@@ -98,7 +107,7 @@ async function getToken(funcLogin : any) : Promise<string>{
                 await funcLogin();
                 
                 await msalLogin.acquireTokenSilent({
-                    scopes: ["https://fn-fretboard2.azurewebsites.net/user_impersonation"]
+                    scopes: ["https://fn-fretboard.azurewebsites.net/user_impersonation"]
                     })
                     .then(function(accessTokenResponse){
                         accessToken = accessTokenResponse.accessToken;

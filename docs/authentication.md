@@ -2,7 +2,7 @@
 
 I want the SPA frontend to be able to talk to Azure functions securely.  Theuser to log in to Azure AD and call the functions using a Bearer token.  The functions can be called with or without the user being authenticated.
 
-# Azure Setup
+# Authorization Setup
 Correct as of 2020-06-10
 - Create a Function App
 - Function App > Authentication / Authorization
@@ -22,10 +22,44 @@ By default when users first log in they will be prompted to provide consent to t
 - click 'Grant admin consent for Default Directory'
 
 Configuring ADD App for SPA access
-- From Azure Active Directory >  App Registrations > click the ADD App
-- Optional - for local development add 'https://localhost:8080' to Redirect URIs
+- From Azure Active Directory >  App Registrations > click the ADD App >  Authentication
 - I'm not using MSAL.js v2.0 (As B2C can't use it yet and I want to move to B2C) so need to Implicit grant Access tokens and ID tokens
+- Optional for local development add 'https://localhost:8080' to Redirect URIs
 - Save
+
+# Environemtn setup
+
+CORS
+- Function App > fn-fretboard > CORS
+- Add in the origin for the spa app
+- Optional - for local testing add 'https://localhost:8080'
+
+Static Website hosting
+- Create Storage account - stfretboard
+- Storage account > Static website > Enabled
+- Index document name: index.html
+- Error document path: 404.html
+- Save (Primary endpoint is displayed)
+
+Static Website Metrics
+https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website-how-to?tabs=azure-portal#metrics  
+- Storage account > Metrics
+- Change timespan to 30 days
+- Add Metric - Scope:stfretboard Metric, Namespace:Blob, Metric:Egress, Aggregation:Sum
+- Add Filter - Property:API name, Values:GetWebContent
+
+BLOB Containers now has a $web endpoint.
+
+## Copying static website to blob storage
+Install azcopy and add to Vironemtn Variables PATH. Navigate to the root folder.
+- Storage account > Access control: Give the user 'Storage Blob Data Contributor' role
+Once you've logged in you may need to wait a few minutes for the above permission change to take effect before copying the files
+```
+az login --tenant-id=a061aca6-27f7-48ab-81c8-172f7bc9f4e9
+azcopy copy dist/* "https://stfretboard.blob.core.windows.net/$web" --recursive
+```
+
+
 
 To authenticate in a SPA use MSAL.js
 ```

@@ -21,7 +21,7 @@ import * as Msal from 'msal'
     ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer', 'login'])
     },
   computed: {
-    ...mapGetters(['isTrainerStarted', 'getLoginName', 'getLoginError']),
+    ...mapGetters(['isTrainerStarted', 'getLoginName', 'getLoginError', 'getResponse']),
     ...mapState(['trainerTimer', 'answerOptions']),
     },
 
@@ -44,38 +44,6 @@ export default class Fretboard extends Vue{
     if(this.guitar != null)
       this.guitar.play(note, this.ac.currentTime, { duration: 3})
   };
-
-  login_tmp(): void{
-    var self = this;
-
-    let msalLogin = new Msal.UserAgentApplication({
-      auth:{
-        clientId: "95f851f6-de0f-4dae-9d39-4b0fc90dc6b1",
-        redirectUri: "https://localhost:8080/",
-        postLogoutRedirectUri: "https://localhost:8080/",
-        authority: "https://login.microsoftonline.com/a061aca6-27f7-48ab-81c8-172f7bc9f4e9"
-      }
-    });
-
-    var auth = msalLogin.loginPopup({
-    scopes: ["User.ReadWrite", "https://fn-fretboard2.azurewebsites.net/user_impersonation"]
-    })
-    .then(function(loginResponse){
-      //login success
-      
-      msalLogin.acquireTokenSilent({
-        scopes: ["https://fn-fretboard2.azurewebsites.net/user_impersonation"]
-      })
-      .then(function(accessTokenResponse){
-        let accessToken = accessTokenResponse.accessToken;
-        debugger;
-      })
-    }).catch(function (error) {
-      //login failure
-      console.log(error);
-      debugger;
-    });
-  }
 }
 </script>
 
@@ -84,7 +52,8 @@ export default class Fretboard extends Vue{
     <div>
       <button @click="login">Login</button>
       <h2 v-if="getLoginName">Hi {{ getLoginName }}!</h2>
-      <div v-if="getLoginError">{{ getLoginError }}</div>
+      <div v-if="getLoginError" style="color:red">{{ getLoginError }}</div>
+      <div v-if="getResponse" style="border:1px solid green">{{ getResponse }}</div>
     </div>
     <div>
       Note Trainer:

@@ -13,7 +13,7 @@ How the 'What's the note' trainer should work:
 7. Record the time and the note
 8. Go to 2.
 
-## Project setup
+## SPA Project setup
 1) Install Vue CLI
 ```
 npm install -g @vue/cli
@@ -42,10 +42,13 @@ This local web server has HMR enabled by default.
 npm run build
 ```
 
+## Architecture and Deployment
+[documentation regarding the architecture and eployment via ARM Templates and scripting](docs/architecture)
+
 ## Authentication
 [documentation regarding configuration of authentication](/docs/authentication)
 
-## resources
+## Resources
 https://vuex.vuejs.org/  
 https://class-component.vuejs.org/  
 [vue-class-component github documentation](https://github.com/vuejs/vue-class-component)  
@@ -63,6 +66,9 @@ https://github.com/danigb/soundfont-player
 - ~~Add remaining frets~~
 - ~~Show open string notes differently. Add the nut?~~
 - ~~Put inlays on fret board~~
+- If use has logged in get login to persist between page reloads
+- Add configuration to SPA (e.g. setting clientId & tenantId at build time)
+- Add Azure B2C for self service accounts
 - Add Tests
 - Add linting on build
 - Create resources in Azure 'UK South' (As UK West doesn't do appInsights)
@@ -81,31 +87,3 @@ https://github.com/danigb/soundfont-player
 ## Bugs/Fixes
 - answer button ordering is off - currently D# comes before D
 - need to run a separate stopwatch rather than relying on the interval to determine the time taken as code inside the interval lambda pauses the interval.
-
-## Authentication
-
-Goal: 
-- I want users to sign up by themselves so I want to use Azure AD B2C
-- I want users to sign in over javascript (MSAL.js)
-- I want users to be authenticated in the Function app
-
-https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-single-page-app?tabs=app-reg-ga  
-
-https://docs.microsoft.com/en-us/azure/active-directory-b2c/tutorial-single-page-app-webapi?tabs=app-reg-ga%2Capp-reg-preview
-
-https://medium.com/@smartdeveloper/azure-functions-rest-api-security-with-msal-and-azure-ad-c9cd75d3316e
-
-https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-overview
-
-https://docs.microsoft.com/en-us/azure/active-directory/develop/msal-b2c-overview
-
-https://stackoverflow.com/questions/56430002/authenticate-users-to-azure-function-when-user-is-authenticated-in-web-app
-
-https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-auth-aad
-
-https://blog.powney.info/2019/05/add-oauth-implicit-flow-to-azure-function
-
-https://docs.microsoft.com/en-us/azure/active-directory/develop/scenario-spa-acquire-token?tabs=javascript
-
-
-Can't use msal.js 2.0 as B2C doesn't support it yet.
