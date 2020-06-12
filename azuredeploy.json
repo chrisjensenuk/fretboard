@@ -1,0 +1,147 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "defaultValue": "fn-fretboard",
+            "type": "String"
+        },
+        "storageAccountName": {
+            "defaultValue": "stfretboard",
+            "type": "String"
+        },
+        "servicePlanName": {
+            "defaultValue": "plan-fn-fretboard",
+            "type": "String"
+        },
+        "functionStorageAccountName": {
+            "defaultValue": "stfnfretboard",
+            "type": "String"
+        },
+        "aadClientId": {
+            "defaultValue": "4ac362b9-645c-4ffe-b052-327706af7e5a",
+            "type": "String",
+            "metadata": {
+                "description": "An existing Azure Active Directory App Regsitration Application (client) ID to use to secure the Function App"
+            }
+        }
+    },
+    "variables": {
+        "applicationInsightsName": "[parameters('functionAppName')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('functionStorageAccountName')]",
+            "location": "uksouth",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage"
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "uksouth",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('servicePlanName')]",
+            "location": "UK South",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic"
+            },
+            "kind": "functionapp"
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('functionAppName')]",
+            "location": "UK South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlanName'))]"
+            ],
+            "kind": "functionapp",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlanName'))]",
+                "siteConfig": {
+                    "appSettings": [
+                            {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName')), '2019-06-01').keys[0].value)]"
+                            },
+                            {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName')), '2019-06-01').keys[0].value)]"
+                            },
+                            {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[toLower(parameters('functionAppName'))]"
+                            },
+                            {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "dotnet"
+                            },
+                            {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                            },
+                            {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2018-05-01-preview').InstrumentationKey]"
+                            }
+                        ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2018-05-01-preview",
+            "name": "[variables('applicationInsightsName')]",
+            "type": "microsoft.insights/components",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('applicationInsightsName')))]": "Resource"
+            },
+            "properties": {
+                "ApplicationId": "[variables('applicationInsightsName')]",
+                "Request_Source": "IbizaWebAppExtensionCreate"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionAppName'), '/web')]",
+            "location": "UK South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+            ],
+            "properties": {
+                "siteAuthEnabled": true,
+                "siteAuthSettings": {
+                    "clientId": "[parameters('aadClientId')]",
+                    "issuer": "[concat('https://sts.windows.net/', subscription().tenantId, '/')]"
+                    },
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com",
+                        "https://localhost:8080",
+                        "https://stfretboard.z33.web.core.windows.net"
+                    ],
+                    "supportCredentials": false
+                }
+            }
+        }
+    ]
+}

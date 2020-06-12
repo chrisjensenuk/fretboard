@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "value": "fn-fretboard1"
+        },
+        "storageAccountName": {
+            "value": "stfretboard1"
+        },
+        "servicePlanName": {
+            "value": "plan-fn-fretboard1"
+        },
+        "functionStorageAccountName": {
+            "value": "stfnfretboard1"
+        },
+        "aadClientId": {
+            "value" : "3408b8f5-98d2-42ad-8d31-f8fdcfabbc0a"
+        }
+    }
+  }
