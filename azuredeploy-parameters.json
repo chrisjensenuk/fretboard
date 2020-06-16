@@ -2,20 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "location": {
+            "value" : "uksouth"
+        },
         "functionAppName": {
-            "value": "fn-fretboard1"
+            "value": "fn-fretboard2"
         },
         "storageAccountName": {
-            "value": "stfretboard1"
+            "value": "stfretboard2"
         },
-        "servicePlanName": {
-            "value": "plan-fn-fretboard1"
-        },
-        "functionStorageAccountName": {
-            "value": "stfnfretboard1"
-        },
-        "aadClientId": {
-            "value" : "3408b8f5-98d2-42ad-8d31-f8fdcfabbc0a"
+        "aadApiClientId": {
+            "value" : "3a547b28-6e01-4970-a5c9-9eeb7faeb498"
         }
     }
   }

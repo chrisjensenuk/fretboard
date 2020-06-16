@@ -69,49 +69,25 @@ ARM Template was created by:
 [AzureDeploy.json](/azuredeploy.json)  
 [AzureDeploy-parameters.json](/azuredeploy-parameters.json)
 
-## Deployment Instuctions
-1. In Azure Active Directory create an App Registration. Make a note of the appId. Specify this as the `aadClientId` parameter.
-```
-az ad sp create-for-rbac --name https://aad-fretboard
-```
-2. Update (the Azure Deploy Paramters file)[/azuredeploy-parameters.json]
-3. Navigate CMD to the repo root
-```
-SET rg=rg-fretboard
-az login
-az group create --location uksouth --name %rg%
-az deployment group create --resource-group=%rg% --template-file azuredeploy.json  --parameters @azuredeploy-parameters.json
-```
-4. Allow implict grant flow
-This can't be done via the CLI yest so go into the portal and allow Implicit Grant for both Access Tokens and ID tokens. :(
-
-5. 
-Create a static website on the storage account
-```
-az storage blob service-properties update --account-name <<storage account name>> --static-website  --index-document index.html --404-document 404.html
-```
-
-6. Make a note of the web endpoint and update the AAD App Reg to use this as a Redirect URI
-```
-az storage account show -n stfretboard1 --query "primaryEndpoints.web" --output tsv
-az ad app update --id 3408b8f5-98d2-42ad-8d31-f8fdcfabbc0a --add replyUrls "https://stfretboard1.z33.web.core.windows.net/"
-```
-TODO - In the function app need to add Allow Token Audience
-TODO - something isn't working - users are being allowed to sign in but claims not coming through to the app.  Erm config settings ar enot being set? Storage not configured for Func App????
-TODO - Does Token Store need to be On on the function app?
-TODO - Add AAD RedirectUrl to Function app url
-TODO - Add AAD API Permission to Microsoft.Graph User.Read
-TODO - Function Apps Allowed Token Audience needs to be the same as AAD Application ID URI
-TODO - Do I need to set a Client Secret?
-TODO - Grant admin user Blob Contributor role to the Storage Account
-TODO - CORS is wrong. Need to work out what the URL is first before I set it in the ARM template
-TODO - The AD stuff is one time and fiddly to do using the CLI. So just mnaully creatr th App Registration before hand.
 
 
-7. Deploy .NET application (Just publish from Visual Studio for now)
+## Client Id vs Application ID URI
+I was getting confused between the difference between the App's client Id and its Application ID URL as they both uniquely identify an AAD App Registration.
+From what I can tell the client_Id is the identifier of the client app that will be requesting access tokens.  The Application ID URL is the identifier of the resource being requested.  I'm only using the one AAD App Registration at the moment for access control for both the static web site identification and calling the Functions.  I'm thinking I should really create 2 AAD App Registrations (1 for web and 1 for Functions). I can then 'Expose an API' on the Function one and trust the web one as a client application. I think that separation would make the flow clearer.
 
-8. Deploy static website (just use azcopy for now - steps above)
+from here: https://stackoverflow.com/a/28503265/61935
+> The client_id in OAuth refers to the client application that will be requesting resources from the Resource Server.
 
+> The Client app (e.g. your iOS app) will request a JWT from your Authentication Server. In doing so, it passes it's client_id and client_secret along with any user credentials that may be required. The Authorization Server validates the client using the client_id and client_secret and returns a JWT.
+
+> The JWT will contain an aud claim that specifies which Resource Servers the JWT is valid for. If the aud contains www.myfunwebapp.com, but the client app tries to use the JWT on www.supersecretwebapp.com, then access will be denied because that Resource Server will see that the JWT was not meant for it.
+
+## Token Store
+App Service > Authentication / Authorization > Advanced Settings > Token Store
+For the time being this doesn't need to be tunred on.  Example if the user authenticated with Facebook and the app wanted to make posts to the Facebook API on behalf of the user. Then access token required to do with will be automatically stored in the Token Store if this feature was enabled.
+
+## Client Secret
+If only performing identification then don't needs a client serect.  However if you need to create access tokens then you need to setup a client secret for the app to use.
 
 ## MSAL
 To authenticate in a SPA use MSAL.js
@@ -161,3 +137,13 @@ I didn't need to do this in my case. Every Azure subscription gets a free Active
 
 
 When creating the Function .NET Core code ensure the function is set to be anonymous `[HttpTrigger(AuthorizationLevel.Anonymous...` 
+
+## Next Steps
+- Create 2 AAD App Registrations
+- Make sure environment creation steps work. I want to be able to tear down and recreate the environment quickly.  I'll need a mix of ARM and manaul Portal tweaking
+- Have a play with Pulumi
+- Improve MSAL.js calling code
+- Explore B2C
+- Finish the app!
+
+

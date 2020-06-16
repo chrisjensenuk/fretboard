@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "location": {
+            "defaultValue": "uksouth",
+            "type": "String",
+            "metadata" : {
+                "description" : "The location for all resources to be created E.g. uksouth"
+            }
+        },
         "functionAppName": {
             "defaultValue": "fn-fretboard",
             "type": "String"
@@ -10,31 +17,26 @@
             "defaultValue": "stfretboard",
             "type": "String"
         },
-        "servicePlanName": {
-            "defaultValue": "plan-fn-fretboard",
-            "type": "String"
-        },
-        "functionStorageAccountName": {
-            "defaultValue": "stfnfretboard",
-            "type": "String"
-        },
-        "aadClientId": {
-            "defaultValue": "4ac362b9-645c-4ffe-b052-327706af7e5a",
+        "aadApiClientId": {
+            "defaultValue": "3a547b28-6e01-4970-a5c9-9eeb7faeb498",
             "type": "String",
             "metadata": {
-                "description": "An existing Azure Active Directory App Regsitration Application (client) ID to use to secure the Function App"
+                "description": "The AAD client id of fretboard_api App Registration"
             }
         }
     },
     "variables": {
-        "applicationInsightsName": "[parameters('functionAppName')]"
+        "applicationInsightsName": "[parameters('functionAppName')]",
+        "allowedTokenAudience": "[concat('https://', parameters('functionAppName'), '.azurewebsites.net')]",
+        "servicePlanName": "[concat('plan-', parameters('functionAppName'))]",
+        "functionStorageAccountName": "[concat('st', replace(parameters('functionAppName'),'-',''))]"
     },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[parameters('functionStorageAccountName')]",
-            "location": "uksouth",
+            "name": "[variables('functionStorageAccountName')]",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -45,7 +47,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "name": "[parameters('storageAccountName')]",
-            "location": "uksouth",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -55,7 +57,7 @@
         {
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2018-02-01",
-            "name": "[parameters('servicePlanName')]",
+            "name": "[variables('servicePlanName')]",
             "location": "UK South",
             "sku": {
                 "name": "Y1",
@@ -69,20 +71,20 @@
             "name": "[parameters('functionAppName')]",
             "location": "UK South",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlanName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]"
             ],
             "kind": "functionapp",
             "properties": {
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('servicePlanName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('servicePlanName'))]",
                 "siteConfig": {
                     "appSettings": [
                             {
                             "name": "AzureWebJobsStorage",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName')), '2019-06-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('functionStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageAccountName')), '2019-06-01').keys[0].value)]"
                             },
                             {
                             "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
-                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName')), '2019-06-01').keys[0].value)]"
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('functionStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('functionStorageAccountName')), '2019-06-01').keys[0].value)]"
                             },
                             {
                             "name": "WEBSITE_CONTENTSHARE",
@@ -120,27 +122,19 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('functionAppName'), '/web')]",
+            "name": "[concat(parameters('functionAppName'), '/authsettings')]",
             "location": "UK South",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
             ],
             "properties": {
-                "siteAuthEnabled": true,
-                "siteAuthSettings": {
-                    "clientId": "[parameters('aadClientId')]",
-                    "issuer": "[concat('https://sts.windows.net/', subscription().tenantId, '/')]"
-                    },
-                "cors": {
-                    "allowedOrigins": [
-                        "https://functions.azure.com",
-                        "https://functions-staging.azure.com",
-                        "https://functions-next.azure.com",
-                        "https://localhost:8080",
-                        "https://stfretboard.z33.web.core.windows.net"
-                    ],
-                    "supportCredentials": false
-                }
+                "enabled" : true,
+                "unauthenticatedClientAction" : "AllowAnonymous",
+                "clientId": "[parameters('aadApiClientId')]",
+                "issuer": "[concat('https://sts.windows.net/', subscription().tenantId, '/')]",
+                "allowedAudiences" : [
+                    "[variables('allowedTokenAudience')]"
+                ]
             }
         }
     ]
