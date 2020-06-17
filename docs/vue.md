@@ -28,6 +28,10 @@ This local web server has HMR enabled by default.
 ```
 npm run build
 ```
+
+## Development and Production Configuration
+I've created 2 configuration files `/src/config/development.js` and `/src/config/production.js`.  One of these gets included into the build by webpack depending on whether `npm run serve` or `npm run build` has been used.  This creates an external javascript `js/config.js` file that needs to be included in `index.html`. This javascript files create and new global property called `window.__env`. The ts file  `common/config.ts` returns the typed config values.
+
 ## Resources
 https://vuex.vuejs.org/  
 https://class-component.vuejs.org/  

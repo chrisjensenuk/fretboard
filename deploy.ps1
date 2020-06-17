@@ -1,7 +1,7 @@
 # This script will create the Azure resources and deploy the Function Application and SPA Website
 
 # Parameters - Change as you need. These override value in azuredeploy-parameters.json
-$name = "fretboard3" # root name of the service
+$name = "fretboard" # root name of the service
 $location="uksouth" # location to create all the resources
 $aadApiClientId="3a547b28-6e01-4970-a5c9-9eeb7faeb498" # The Client Id of Azure Active Directory App registration: fretboard_api
 
