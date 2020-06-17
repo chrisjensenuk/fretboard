@@ -1,47 +1,81 @@
-## Deployment Instuctions
-1. In Azure Active Directory create an App Registration. Make a note of the appId. Specify this as the `aadClientId` parameter.
-```
-az ad sp create-for-rbac --name https://aad-fretboard
-```
-2. Update (the Azure Deploy Paramters file)[/azuredeploy-parameters.json]
-3. Navigate CMD to the repo root
-```
-SET rg=rg-fretboard
-SET loc=uksouth
-az login
-az group create --location uksouth --name %rg%
-az deployment group create --resource-group=%rg% --template-file azuredeploy.json  --parameters @azuredeploy-parameters.json --parameters location=%loc%
-```
-4. Allow implict grant flow
-This can't be done via the CLI yest so go into the portal and allow Implicit Grant for both Access Tokens and ID tokens. :(
+# Deployment Instuctions
 
-5. 
-Create a static website on the storage account
+## One time configurations
+The creation of the Azure Active Directory App Registrations needs to be done only once so its easiest to just do it in the portal.
+
+### Create App Registrations for the SPA application
+From the Azure Portal go to `Azure Active Directory` > `App registrations` > `New registration`
+
+- name: `fretboard_web` 
+- Authentication > Add a platform > SPA
+- Redirect URI: https://stfretboard.z33.web.core.windows.net/
+- Implict grant: ID tokens, Access Tokens
+
+- name: `fretboard_api`
+- Redirect URI: Web (not specified)
+- Expose an API > Application ID URI > Set: https://fn-fretboard1.azurewebsites.net
+- Add scope > scope name: user_impersonation, Who can consent: Admins only
+- Authorized client applications > Add a client application > Client ID: fretboard_web client id. Authorized scopes: .../user_impersonation
+
+## Creating and Deploying the Resource Groups
+The below assumes you have installed:
+- NET CLI / Visual Studio
+- Vue CLI
+- Azure Powershell Module
+- AzCopy
+
+Update (deploy.ps1)[/deploy.ps1] and set the variables `$name`, `$location`, `$aadApiClientId`  
+From PowerShell navigate to the root of the repo and execute `./deploy.ps1`
+
+This script can be used to create/update the deployment. It does the following.
+
+- Creates the resource group
+- Deploys the (azuredeployjson)[/azuredeploy.json] ARM Template
+- Builds, publishes and zip deploys the .NET Function app
+- Builds and `azcopy` the Vue SPA front end
+
+Deployment is now done!
+
+# Manual Deployment Steps
+Instead of running deploy.ps1 then you can manually configure the environments by following these steps:
+
+Create a Resource Group
+
+Static Website hosting for SPA application
+- Create Storage account - stfretboard
+- Storage account > Static website > Enabled
+- Index document name: index.html
+- Error document path: 404.html
+- Save (Primary endpoint is displayed)
+
+Create a Function App
+- Function App > Authentication / Authorization
+- App Service Authentication: On
+- Authentication Providers > Azure Axtive Directory > Configure
+- Advanced
+- Client ID = AAD Client Id of App Registration `fretboard_api`
+- Issuer Url = https://sts.windows.net/{AAD tenant id}/
+- Allowed Token Audience = AAD `fretboard_api`'s Application ID URI (Should be the same url the function app)
+- OK then Save!
+- CORS > Add the URL of the SPA application
+
+## Deploying static website to blob storage
+Install azcopy and add to Vironemtn Variables PATH. Navigate to the root folder.
+- Storage account > Access control: Give the user 'Storage Blob Data Contributor' role
+Once you've logged in you may need to wait a few minutes for the above permission change to take effect before copying the files
 ```
-az storage blob service-properties update --account-name <<storage account name>> --static-website  --index-document index.html --404-document 404.html
+azcopy login --tenant-id=a061aca6-27f7-48ab-81c8-172f7bc9f4e9
+azcopy copy 'dist/*' 'https://stfretboard.blob.core.windows.net/$web' --recursive
 ```
 
-6. Make a note of the web endpoint and update the AAD App Reg to use this as a Redirect URI
+## Deploying Function App
+Just use Visual Studio's `Publish` functionality to deploy
 
-7. Function Apps Allowed Token Audience needs to be the same as AAD Application ID URI.  The Application ID URI identifies the resource being requested so it makes sense that it should be the same as the Function Apps base URL (although it doesn't need to be!). Make sure the same value is also used in the Function App's AAD 'Allowed Token Audiences'.
+# Further Info
 
-```
-az storage account show -n stfretboard1 --query "primaryEndpoints.web" --output tsv
-az ad app update --id 3408b8f5-98d2-42ad-8d31-f8fdcfabbc0a --add replyUrls "https://stfretboard1.z33.web.core.windows.net/"
-```
-
-7. Deploy .NET application (Just publish from Visual Studio for now)
-
-8. Deploy static website (just use azcopy for now - steps above)
-
-
-- ~~TODO - In the function app need to add Allow Token Audience~~
-- ~~TODO - Function Apps Allowed Token Audience needs to be the same as AAD Application ID URI~~
-- ~~TODO - Does Token Store need to be On on the function app?~~
-- TODO - Add AAD RedirectUrl to Function app url
-- TODO - Add AAD API Permission to Microsoft.Graph User.Read
-- ~~TODO - Do I need to set a Client Secret?~~
-- TODO - Investigate Pulumi
-- TODO - Grant admin user Blob Contributor role to the Storage Account
-- TODO - CORS is wrong. Need to work out what the URL is first before I set it in the ARM template
-- TODO - The AD stuff is one time and fiddly to do using the CLI. So just mnaully creatr th App Registration before hand.
+## ARM Template
+ARM Template was created by:
+- first manaully creating the environment using the Portal.
+- From resource view Export all the resources for the group
+- Following examples from the [Quick Start Templates](https://azure.microsoft.com/en-us/resources/templates/) cut out the bits I don't need
+- Use [Azure Resource Explorer](https://resources.azure.com) to get further information what wasn't included in the export, such as `appSettings` & `siteAuthSettings`.

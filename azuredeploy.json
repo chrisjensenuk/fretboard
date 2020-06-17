@@ -136,6 +136,25 @@
                     "[variables('allowedTokenAudience')]"
                 ]
             }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionAppName'), '/web')]",
+            "location": "UK South",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com",
+                        "[concat('https://', parameters('storageAccountName'), '.z33.web.core.windows.net')]"
+                    ]
+                }
+            }
         }
     ]
 }

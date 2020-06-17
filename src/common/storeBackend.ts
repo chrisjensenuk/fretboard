@@ -2,11 +2,15 @@ import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
 import * as Msal from 'msal'
 import axios from 'axios'; 
 
+const spaUrl = "https://stfretboard3.z33.web.core.windows.net/";
+const functionAppUrl = "https://fn-fretboard3.azurewebsites.net/";
+const functionAppScope = "https://fn-fretboard3.azurewebsites.net/user_impersonation";
+
 let msalLogin = new Msal.UserAgentApplication({
     auth:{
-        clientId: "4ac362b9-645c-4ffe-b052-327706af7e5a",
-        redirectUri: "https://stfretboard.z33.web.core.windows.net/",
-        postLogoutRedirectUri: "https://stfretboard.z33.web.core.windows.net/",
+        clientId: "269a365c-52ba-4ad1-a745-5016f53e7d07",
+        redirectUri: spaUrl,
+        postLogoutRedirectUri: spaUrl,
         authority: "https://login.microsoftonline.com/a061aca6-27f7-48ab-81c8-172f7bc9f4e9"
     }
 });
@@ -56,7 +60,7 @@ export default class storeBackend extends VuexModule{
         var self = this;
           
         await msalLogin.loginPopup({
-        scopes: ["User.ReadWrite", "https://fn-fretboard.azurewebsites.net/user_impersonation"],
+        scopes: ["User.ReadWrite", functionAppScope],
         prompt: "select_account",
         loginHint: ""
         })
@@ -79,7 +83,7 @@ export default class storeBackend extends VuexModule{
         
         var accessToken = await getToken(self.context.dispatch("login"));
         
-        axios.get("https://fn-fretboard.azurewebsites.net/api/test", {
+        axios.get(`${functionAppUrl}api/test`, {
             headers: { Authorization: `Bearer ${accessToken}` }
         })
         .then(function(response){
@@ -95,7 +99,7 @@ async function getToken(funcLogin : any) : Promise<string>{
     let accessToken = "" as string;
 
     await msalLogin.acquireTokenSilent({
-        scopes: ["https://fn-fretboard.azurewebsites.net/user_impersonation"]
+        scopes: [functionAppScope]
         })
         .then(function(accessTokenResponse){
             accessToken = accessTokenResponse.accessToken;
@@ -107,7 +111,7 @@ async function getToken(funcLogin : any) : Promise<string>{
                 await funcLogin();
                 
                 await msalLogin.acquireTokenSilent({
-                    scopes: ["https://fn-fretboard.azurewebsites.net/user_impersonation"]
+                    scopes: [functionAppScope]
                     })
                     .then(function(accessTokenResponse){
                         accessToken = accessTokenResponse.accessToken;

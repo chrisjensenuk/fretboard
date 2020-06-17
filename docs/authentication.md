@@ -1,93 +1,14 @@
 # Authentication
 
-I want the SPA frontend to be able to talk to Azure functions securely.  Theuser to log in to Azure AD and call the functions using a Bearer token.  The functions can be called with or without the user being authenticated.
-
-# Authorization Setup
-Correct as of 2020-06-10
-- Create a Function App
-- Function App > Authentication / Authorization
-- App Service Authentication: On
-- Authentication Providers > Azure Axtive Directory > Configure
-- Express
-- Create New AD App (Call it something general, this app could be used for all APIs not just functions)
-- OK then Save!
-
-Optional - Add yourself as the Owner of the ADD App
-- Go to Azure Active Directory in the portal > App registrations > All applications
-- click the ADD App you created above (Owners and add yourself - you don't need to do this but made sense to me)
-
-Optional - Grant Consent
-By default when users first log in they will be prompted to provide consent to the Application. You can skip this by blanket consenting for all users
-- In the ADD App > API permissions
-- click 'Grant admin consent for Default Directory'
-
-Configuring ADD App for SPA access
-- From Azure Active Directory >  App Registrations > click the ADD App >  Authentication
-- I'm not using MSAL.js v2.0 (As B2C can't use it yet and I want to move to B2C) so need to Implicit grant Access tokens and ID tokens
-- Optional for local development add 'https://localhost:8080' to Redirect URIs
-- Save
-
-# Environment setup
-
-CORS
-- Function App > fn-fretboard > CORS
-- Add in the origin for the spa app
-- Optional - for local testing add 'https://localhost:8080'
-
-Static Website hosting
-- Create Storage account - stfretboard
-- Storage account > Static website > Enabled
-- Index document name: index.html
-- Error document path: 404.html
-- Save (Primary endpoint is displayed)
-
-Static Website Metrics
-https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blob-static-website-how-to?tabs=azure-portal#metrics  
-- Storage account > Metrics
-- Change timespan to 30 days
-- Add Metric - Scope:stfretboard Metric, Namespace:Blob, Metric:Egress, Aggregation:Sum
-- Add Filter - Property:API name, Values:GetWebContent
-
-BLOB Containers now has a $web endpoint.
-
-## Copying static website to blob storage
-Install azcopy and add to Vironemtn Variables PATH. Navigate to the root folder.
-- Storage account > Access control: Give the user 'Storage Blob Data Contributor' role
-Once you've logged in you may need to wait a few minutes for the above permission change to take effect before copying the files
-```
-azcopy login --tenant-id=a061aca6-27f7-48ab-81c8-172f7bc9f4e9
-azcopy copy dist/* "https://stfretboard.blob.core.windows.net/$web" --recursive
-```
-
-## ARM Template
-ARM Template was created by:
-- first manaully creating the environment using the Portal.
-- From resource view Export all the resources for the group
-- Following examples from the [Quick Start Templates](https://azure.microsoft.com/en-us/resources/templates/) cut out the bits I don't need
-- Use [Azure Resource Explorer](https://resources.azure.com) to get further information what wasn't included in the export, such as `appSettings` & `siteAuthSettings`.
-
-[AzureDeploy.json](/azuredeploy.json)  
-[AzureDeploy-parameters.json](/azuredeploy-parameters.json)
-
-
+I want the SPA frontend to be able to talk to Azure functions securely.  The user will log in to Azure AD and call the functions using a Bearer token.  The functions can be called with or without the user being authenticated.
 
 ## Client Id vs Application ID URI
 I was getting confused between the difference between the App's client Id and its Application ID URL as they both uniquely identify an AAD App Registration.
-From what I can tell the client_Id is the identifier of the client app that will be requesting access tokens.  The Application ID URL is the identifier of the resource being requested.  I'm only using the one AAD App Registration at the moment for access control for both the static web site identification and calling the Functions.  I'm thinking I should really create 2 AAD App Registrations (1 for web and 1 for Functions). I can then 'Expose an API' on the Function one and trust the web one as a client application. I think that separation would make the flow clearer.
-
-from here: https://stackoverflow.com/a/28503265/61935
-> The client_id in OAuth refers to the client application that will be requesting resources from the Resource Server.
-
-> The Client app (e.g. your iOS app) will request a JWT from your Authentication Server. In doing so, it passes it's client_id and client_secret along with any user credentials that may be required. The Authorization Server validates the client using the client_id and client_secret and returns a JWT.
-
-> The JWT will contain an aud claim that specifies which Resource Servers the JWT is valid for. If the aud contains www.myfunwebapp.com, but the client app tries to use the JWT on www.supersecretwebapp.com, then access will be denied because that Resource Server will see that the JWT was not meant for it.
+From what I can tell the client_Id is the identifier of the client app that will be requesting access tokens.  The Application ID URL is the identifier of the resource being requested.
 
 ## Token Store
 App Service > Authentication / Authorization > Advanced Settings > Token Store
 For the time being this doesn't need to be tunred on.  Example if the user authenticated with Facebook and the app wanted to make posts to the Facebook API on behalf of the user. Then access token required to do with will be automatically stored in the Token Store if this feature was enabled.
-
-## Client Secret
-If only performing identification then don't needs a client serect.  However if you need to create access tokens then you need to setup a client secret for the app to use.
 
 ## MSAL
 To authenticate in a SPA use MSAL.js
@@ -125,7 +46,7 @@ login(): void{
   }
 }
 ```
-note: the `https://fn-fretboard2.azurewebsites.net/user_impersonation` scope can be found in the ADD App > 'Expose an API'.
+note: the `https://fn-fretboard2.azurewebsites.net/user_impersonation` scope can be found in the Function App's ADD App Registration > 'Expose an API'.
 
 # Giving users access to the application
 I didn't need to do this in my case. Every Azure subscription gets a free Active Directory (TenantId) so I'm happy that any user in my subscription automatically gets access to the app. If I wanted to assign users to the App these are the steps I'd take.
@@ -135,15 +56,13 @@ I didn't need to do this in my case. Every Azure subscription gets a free Active
 - I would create an AD group and assign this group to the App however my AD plan doesn't allow group assignment.
 - In the meantime just would manually add the users as needed or create an app to sync using Graph
 
-
 When creating the Function .NET Core code ensure the function is set to be anonymous `[HttpTrigger(AuthorizationLevel.Anonymous...` 
 
 ## Next Steps
-- Create 2 AAD App Registrations
-- Make sure environment creation steps work. I want to be able to tear down and recreate the environment quickly.  I'll need a mix of ARM and manaul Portal tweaking
+- ~~Create 2 AAD App Registrations~~
+- ~~Make sure environment creation steps work. I want to be able to tear down and recreate the environment quickly.  I'll need a mix of ARM and manaul Portal tweaking~~
 - Have a play with Pulumi
 - Improve MSAL.js calling code
-- Explore B2C
-- Finish the app!
+- Explore B2C for user self service.
 
 
