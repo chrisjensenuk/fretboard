@@ -21,6 +21,11 @@ App Registrations
 1. `fretboard_web` The SPA will authenticate against this.  
 2. `fretboard_api` Secures the Function App. It trusts `fretboard_web`  
 
+# Blog
+The trials and tribulations of building this app.    
+[2020-06-18 - Azure Function Core Tools, ClaimsPrincipal and Local Debugging](blog/2020-06-18_claimsprincipal-azure-functions-core-tools.md)
+
+
 # Documentation
 
 ## Deployment
