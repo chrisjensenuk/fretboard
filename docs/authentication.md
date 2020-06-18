@@ -58,6 +58,15 @@ I didn't need to do this in my case. Every Azure subscription gets a free Active
 
 When creating the Function .NET Core code ensure the function is set to be anonymous `[HttpTrigger(AuthorizationLevel.Anonymous...` 
 
+# Local Debugging
+- Add `https://localhost:8080/` to the ADD `freetboard_web` Redirect URIs.  
+
+So it appears that running Functions locally (F5) using `Azure Functions Core Tools`. Doesn't do ANY authentication including population of the claims passed in by the AAD bearer token.  Its just sets a default claim `http://schemas.microsoft.com/2017/07/functions/claims/authlevel=Admin`. So local debugging of auth just doesn't work!
+[see line in GitHub](https://github.com/Azure/azure-functions-core-tools/blob/b2157d366244c7a72f208261ba8d3c5acbda8f81/src/Azure.Functions.Cli/Actions/HostActions/WebHost/Security/CliAuthenticationHandler.cs#L25)
+
+https://cmatskas.com/create-an-azure-ad-protected-api-using-azure-functions-and-net-core-3-1/
+
+
 ## Next Steps
 - ~~Create 2 AAD App Registrations~~
 - ~~Make sure environment creation steps work. I want to be able to tear down and recreate the environment quickly.  I'll need a mix of ARM and manaul Portal tweaking~~

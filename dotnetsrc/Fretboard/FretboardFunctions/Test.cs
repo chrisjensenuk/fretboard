@@ -18,6 +18,9 @@ namespace FretboardFunctions
             ILogger log,
             ClaimsPrincipal claimsPrincipal)
         {
+#if DEBUG
+            claimsPrincipal = await OpenIdConnectLocal.GetClaimsPrincipal(req);
+#endif
 
             var isAuthenticated = claimsPrincipal.Identity.IsAuthenticated ? "Authenticated" : "Not authenticated";
             var claims = string.Join(" | ", claimsPrincipal.Claims.Select(c => $"{c.Type}={c.Value}|"));
