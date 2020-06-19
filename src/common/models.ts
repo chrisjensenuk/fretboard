@@ -30,3 +30,11 @@ export interface LoginData{
   displayName?: string,
   error?: string
 }
+
+export interface Answer {
+  fretNo: number,
+  stringNo: number,
+  note: string,
+  attempts: number,
+  timeTaken: number
+}

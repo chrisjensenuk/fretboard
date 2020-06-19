@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {NoteData, TrainerState} from '@/common/models'
+import {NoteData, TrainerState, Answer} from '@/common/models'
 import NoteTrainerService from '@/application/NoteTrainerService'
 import storeApi from '@/store/storeApi'
 import createPersistedState from "vuex-persistedstate";
@@ -15,7 +15,8 @@ const store = new Vuex.Store({
         answerNote!: null as null | NoteData,
         trainerTimer: 0 as number,
         answerOptions: null as null | Array<NoteData>,
-        wrongChoices:[] as Array<NoteData>
+        wrongChoices:[] as Array<NoteData>,
+        answers:[] as Array<Answer>
     },
 
     modules:{
@@ -45,6 +46,10 @@ const store = new Vuex.Store({
 
         CLEAR_WRONG_CHOICES(state){
             state.wrongChoices = new Array<NoteData>();
+        },
+
+        ADD_ANSWER(state, answer: Answer){
+            state.answers.push(answer);
         }
     },
 
@@ -97,8 +102,9 @@ NoteTrainerService.stateChanged = (trainerState: TrainerState) => store.dispatch
 NoteTrainerService.answerNoteChanged = (answerNote: NoteData) => store.dispatch("setAnswerNote", answerNote);
 NoteTrainerService.answerOptionsChanged = (answerOptions: Array<NoteData>) => store.dispatch("setAnswerOptions", answerOptions);
 NoteTrainerService.timerChanged = (timer: number) => store.dispatch("setTrainerTimer", timer);
-NoteTrainerService.saveGuess = () => store.dispatch("saveGuess", null);
+NoteTrainerService.saveAnswer = (answer: Answer) => store.dispatch("saveAnswer", answer);
 NoteTrainerService.addWrongChoice = (wrongNote: NoteData) => store.dispatch("addWrongChoice", wrongNote);
 NoteTrainerService.clearWrongChoices = () => store.dispatch("clearWrongChoices");
+NoteTrainerService.getWrongChoices = () => store.state.wrongChoices;
 
 export default store;

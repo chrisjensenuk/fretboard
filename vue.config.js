@@ -18,7 +18,12 @@ module.exports = {
         from: configFile,
         to: "js/config.js"
       });
-      return [pathConfigs]})
       
+      pathConfigs.unshift({
+        from: "node_modules/canvas-confetti/dist",
+        to: "js"
+      });
+      
+      return [pathConfigs]})
   },
 }

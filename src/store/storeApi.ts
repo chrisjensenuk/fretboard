@@ -1,8 +1,8 @@
 import { Module, VuexModule, Mutation, Action } from 'vuex-module-decorators'
-import axios from 'axios'; 
+import axios, { AxiosRequestConfig } from 'axios'; 
 import {Config} from '@/common/config'
 import auth from '@/api/authentication'
-import { LoginData } from '@/common/models';
+import { LoginData, Answer } from '@/common/models';
 
 @Module
 export default class storeBackend extends VuexModule{
@@ -56,7 +56,6 @@ export default class storeBackend extends VuexModule{
 
     @Action
     logout(){
-        debugger;
         let loginData : LoginData = {
             isAuthenticated: false,
         };
@@ -67,15 +66,21 @@ export default class storeBackend extends VuexModule{
     }
 
     @Action
-    async saveGuess(){
+    async saveAnswer(answer : Answer){
 
         let self = this;
         
-        var accessToken = await auth.getAccessToken();
+        this.context.commit('ADD_ANSWER', answer);
+
+        var requestConfig: AxiosRequestConfig = {};
         
-        axios.get(`${Config.functionAppUrl}api/test`, {
-            headers: { Authorization: `Bearer ${accessToken}` }
-        })
+        if(self.loginData.isAuthenticated)
+        {
+            var accessToken = await auth.getAccessToken();
+            requestConfig.headers =  { Authorization: `Bearer ${accessToken}` };
+        }
+        
+        axios.get(`${Config.functionAppUrl}api/test`, requestConfig)
         .then(function(response){
             self.context.commit('SET_RESPONSE', response.data)
         })

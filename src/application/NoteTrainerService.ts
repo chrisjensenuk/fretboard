@@ -5,7 +5,7 @@ Vuex store calls functions on this class
 The class is not to be imported into components. Should only be imported into the Vuex store
 */
 
-import { NoteData, fretData, TrainerState } from '@/common/models'
+import { NoteData, fretData, TrainerState, Answer } from '@/common/models'
 
 const timerInterval = 100 as number;
 
@@ -16,14 +16,16 @@ class NoteTrainerService {
     answerNoteChanged!: (note: NoteData) => void;
     answerOptionsChanged!: (answerOptions: Array<NoteData>) => void;
     timerChanged!: (time: number) => void;
-    saveGuess!:() => void;
+    saveAnswer!:(answer : Answer) => void;
     addWrongChoice!:(wrongNote : NoteData) => void;
     clearWrongChoices!:() => void;
+    getWrongChoices!:() => Array<NoteData>;
 
     static readonly timerInterval = 100 as number;
 
     private noteTrainerInterval : number = 0;
     private trainerState: TrainerState;
+    private startTime: Date = new Date();
 
     constructor(){
         this.trainerState = TrainerState.Stopped;
@@ -63,16 +65,15 @@ class NoteTrainerService {
         //todo: wait for the answer button click
 
         //todo: show how long it took, if correct, play the note and display the note
-        
-        var timer = 0;
-        this.timerChanged(timer);
+        this.startTime = new Date();
+        this.timerChanged(0);
 
         this.trainerState = TrainerState.Started;
         this.stateChanged(this.trainerState);
 
         this.noteTrainerInterval = setInterval(function(){
-            timer += timerInterval;
-            self.timerChanged(timer);
+            let elapsedTime = new Date().getTime() - self.startTime.getTime();
+            self.timerChanged(elapsedTime);
         }, timerInterval)
     }
 
@@ -91,8 +92,16 @@ class NoteTrainerService {
         if(chosenNote == correctNote){
             console.log("correct!");
 
+            var answer: Answer = {
+                fretNo: chosenNote.fretNo,
+                stringNo: chosenNote.stringNo,
+                note: chosenNote.note,
+                timeTaken: new Date().getTime() - this.startTime.getTime(),
+                attempts : this.getWrongChoices().length + 1
+            }
+
             //log correct guess and time time and number of attempts
-            this.saveGuess();
+            this.saveAnswer(answer);
 
             //do a hurrah!
 

@@ -1,11 +1,9 @@
-﻿using System;
+﻿using Microsoft.Azure.Cosmos.Table;
 
-namespace FretboardFunctions.Entities
+namespace FretboardFunctions.TableEntities
 {
-    public class GuessDto
+    public class Answer : TableEntity
     {
-        public string UserId { get; set; }
-        public string Date { get; set; }
         public int FretNo { get; set; }
         public int StringNo { get; set; }
         public int Attempts { get; set; }

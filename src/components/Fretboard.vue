@@ -8,6 +8,8 @@ import {instrument, Player} from 'soundfont-player';
 import {NoteData, fretData} from '@/common/models';
 import { mapActions, mapGetters, mapState } from 'vuex';
 
+declare var confetti: any;
+
 @Component({
   components: {
     Fret,
@@ -16,7 +18,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
   },
   filters:{
     timerFilter(value : number){
-      return value / 1000
+      return (value / 1000).toFixed(2);
     }
   },
   methods: {
@@ -55,6 +57,22 @@ export default class Fretboard extends Vue{
             this.guitar.play("C#2", this.ac.currentTime, { duration: 0.5});
           }
        }
+  }
+
+  @Watch("$store.state.answers")
+  watchAnswers(){
+    let answers = this.$store.state.answers;
+    if(answers.length > 0){
+      var answer = answers[answers.length - 1];
+
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      this.playNote(answer.note);
+    }
   }
 
   playNote(note : string): void{
