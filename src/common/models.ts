@@ -24,3 +24,9 @@ export enum TrainerState {
   Stopped,
   Started
 }
+
+export interface LoginData{
+  isAuthenticated: boolean,
+  displayName?: string,
+  error?: string
+}

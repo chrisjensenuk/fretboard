@@ -2,11 +2,14 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import {NoteData, TrainerState} from '@/common/models'
 import NoteTrainerService from '@/application/NoteTrainerService'
-import storeBackend from '@/common/storeBackend'
+import storeApi from '@/store/storeApi'
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
+    plugins: [createPersistedState()],
+
     state: {
         trainerState: TrainerState.Stopped,
         answerNote!: null as null | NoteData,
@@ -15,7 +18,7 @@ const store = new Vuex.Store({
     },
 
     modules:{
-        storeBackend
+        storeApi
     },
 
     mutations: {

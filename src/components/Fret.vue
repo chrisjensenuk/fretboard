@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Component, Prop, Vue, Emit } from 'vue-property-decorator';
-import store from '@/common/store';
+import store from '@/store';
 import * as Soundfont from 'soundfont-player';
 import { NoteData } from '@/common/models';
 import { mapActions, mapGetters, mapState } from 'vuex';

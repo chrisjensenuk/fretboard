@@ -1,16 +1,16 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import store from '@/common/store'
+import store from '@/store'
 import Fret from './Fret.vue';
+import LoginBar from './LoginBar.vue';
 import {instrument, Player} from 'soundfont-player';
 import {NoteData, fretData} from '@/common/models';
 import { mapActions, mapGetters, mapState } from 'vuex';
-import * as Msal from 'msal'
-
 
 @Component({
   components: {
-    Fret
+    Fret,
+    LoginBar
   },
   filters:{
     timerFilter(value : number){
@@ -18,7 +18,7 @@ import * as Msal from 'msal'
     }
   },
   methods: {
-    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer', 'login'])
+    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer', 'login', 'logout'])
     },
   computed: {
     ...mapGetters(['isTrainerStarted', 'getLoginName', 'getLoginError', 'getResponse']),
@@ -38,6 +38,9 @@ export default class Fretboard extends Vue{
     instrument(this.ac, 'acoustic_guitar_steel', {gain : 5}).then(function (guitar : any) {
       self.guitar = guitar
     });
+
+    //always load the page with the trainer stopped
+    this.$store.dispatch('stopTrainer');
   };
 
   playNote(note : string): void{
@@ -49,12 +52,9 @@ export default class Fretboard extends Vue{
 
 <template>
   <section>
-    <div>
-      <button @click="login">Login</button>
-      <h2 v-if="getLoginName">Hi {{ getLoginName }}!</h2>
-      <div v-if="getLoginError" style="color:red">{{ getLoginError }}</div>
-      <div v-if="getResponse" style="border:1px solid green">{{ getResponse }}</div>
-    </div>
+
+    <LoginBar />
+    
     <div>
       Note Trainer:
       <button @click="startTrainer" v-if="isTrainerStarted == false">Start</button>

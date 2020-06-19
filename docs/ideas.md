@@ -40,6 +40,7 @@ Azure Icon set: https://jgraph.github.io/drawio-libs/libs/integration/azure.xml
 - Add TypeScript linting on build
 - ~~Create resources in Azure 'UK South' (As UK West doesn't do appInsights)~~
 - Log javascript to AppInsights
+- GCPR Cookie declaration
 
 ## Bugs/Fixes
 - answer button ordering is off - currently D# comes before D
