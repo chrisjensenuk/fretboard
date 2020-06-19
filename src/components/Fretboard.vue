@@ -1,8 +1,9 @@
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import store from '@/store'
 import Fret from './Fret.vue';
 import LoginBar from './LoginBar.vue';
+import AnswerButtons from './AnswerButtons.vue';
 import {instrument, Player} from 'soundfont-player';
 import {NoteData, fretData} from '@/common/models';
 import { mapActions, mapGetters, mapState } from 'vuex';
@@ -10,7 +11,8 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 @Component({
   components: {
     Fret,
-    LoginBar
+    LoginBar,
+    AnswerButtons
   },
   filters:{
     timerFilter(value : number){
@@ -18,19 +20,20 @@ import { mapActions, mapGetters, mapState } from 'vuex';
     }
   },
   methods: {
-    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer', 'login', 'logout'])
+    ...mapActions(['startTrainer', 'stopTrainer', 'selectAnswer'])
     },
   computed: {
-    ...mapGetters(['isTrainerStarted', 'getLoginName', 'getLoginError', 'getResponse']),
+    ...mapGetters(['isTrainerStarted']),
     ...mapState(['trainerTimer', 'answerOptions']),
-    },
-
+    }
 })
 export default class Fretboard extends Vue{
   private ac : AudioContext = new AudioContext();
   private guitar !: Player;
-
   private frets = fretData;
+
+  //make TypeScript aware of mapActions/mapGetters/mapState
+  stopTrainer!:() => void;
 
   created() : void{
     var self = this;
@@ -40,8 +43,19 @@ export default class Fretboard extends Vue{
     });
 
     //always load the page with the trainer stopped
-    this.$store.dispatch('stopTrainer');
+    this.stopTrainer();
   };
+
+  @Watch("$store.state.wrongChoices")
+  watchWrongChoices(){
+    if(this.$store.state.wrongChoices.length > 0){
+          //A wrong note has just been chosen.
+          if(this.guitar != null){
+            this.guitar.play("D2", this.ac.currentTime, { duration: 0.5});
+            this.guitar.play("C#2", this.ac.currentTime, { duration: 0.5});
+          }
+       }
+  }
 
   playNote(note : string): void{
     if(this.guitar != null)
@@ -67,9 +81,8 @@ export default class Fretboard extends Vue{
         <Fret v-for="(fret, index) in frets" :key="index" :fret="fret" :fretNo="index" @play-note="playNote" />
     </div>
 
-    <div v-if="answerOptions != null" class="answer-buttons">
-      <button v-for="(answerOption, index) in answerOptions" :key="index" @click="selectAnswer(answerOption)" class="answer-button">{{ answerOption.note | noteFilter }}</button>
-    </div>
+    <AnswerButtons />
+
   </section>
 </template>
 

@@ -12,11 +12,13 @@ const timerInterval = 100 as number;
 class NoteTrainerService {
 
     //callback functions to be overridden by calling class
-    stateChanged: (state: TrainerState) => void;
-    answerNoteChanged: (note: NoteData) => void;
-    answerOptionsChanged: (answerOptions: Array<NoteData>) => void;
-    timerChanged: (time: number) => void;
-    saveGuess:() => void;
+    stateChanged!: (state: TrainerState) => void;
+    answerNoteChanged!: (note: NoteData) => void;
+    answerOptionsChanged!: (answerOptions: Array<NoteData>) => void;
+    timerChanged!: (time: number) => void;
+    saveGuess!:() => void;
+    addWrongChoice!:(wrongNote : NoteData) => void;
+    clearWrongChoices!:() => void;
 
     static readonly timerInterval = 100 as number;
 
@@ -24,13 +26,6 @@ class NoteTrainerService {
     private trainerState: TrainerState;
 
     constructor(){
-        //terminate callbacks that are expected to be overridden
-        this.stateChanged = () => {};
-        this.answerNoteChanged = () => {};
-        this.answerOptionsChanged = () => {};
-        this.timerChanged = () => {};
-        this.saveGuess = () => {};
-
         this.trainerState = TrainerState.Stopped;
     }
     
@@ -39,7 +34,10 @@ class NoteTrainerService {
 
         console.log("starting trainer");
         
-        //todo: randomly get a note
+        //forget previous guesses
+        this.clearWrongChoices();
+        
+        //get a random note
         var answerNote = self.getRandomNote();
         console.log("random note:" + answerNote.note);
         self.answerNoteChanged(answerNote);
@@ -81,19 +79,20 @@ class NoteTrainerService {
     stop(): void{
         this.trainerState = TrainerState.Stopped;
         this.stateChanged(this.trainerState);
-
+        
+        this.answerOptionsChanged([]);
+        
         clearInterval(this.noteTrainerInterval);
     }
 
-    selectAnswer(guessedNote: NoteData, correctNote: NoteData | null){
-        this.saveGuess();
+    chooseAnswer(chosenNote: NoteData, correctNote: NoteData | null){
         
         //is the answer correct?
-        if(guessedNote == correctNote){
+        if(chosenNote == correctNote){
             console.log("correct!");
 
             //log correct guess and time time and number of attempts
-            
+            this.saveGuess();
 
             //do a hurrah!
 
@@ -102,7 +101,9 @@ class NoteTrainerService {
             this.start();
         }
         else{
-          //try again
+          //save the wrong selection
+          this.addWrongChoice(chosenNote);
+
           console.log("try again");
         }
     }

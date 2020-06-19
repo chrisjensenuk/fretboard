@@ -15,6 +15,7 @@ const store = new Vuex.Store({
         answerNote!: null as null | NoteData,
         trainerTimer: 0 as number,
         answerOptions: null as null | Array<NoteData>,
+        wrongChoices:[] as Array<NoteData>
     },
 
     modules:{
@@ -36,6 +37,14 @@ const store = new Vuex.Store({
 
         SET_ANSWER_OPTIONS(state, answerOptions : Array<NoteData>){
             state.answerOptions = answerOptions;
+        },
+
+        ADD_WRONG_CHOICE(state, wrongNote : NoteData){
+            state.wrongChoices.push(wrongNote);
+        },
+
+        CLEAR_WRONG_CHOICES(state){
+            state.wrongChoices = new Array<NoteData>();
         }
     },
 
@@ -49,8 +58,8 @@ const store = new Vuex.Store({
             NoteTrainerService.stop();
         },
 
-        selectAnswer(context, note : NoteData){
-            NoteTrainerService.selectAnswer(note, context.state.answerNote);
+        chooseAnswer(context, note : NoteData){
+            NoteTrainerService.chooseAnswer(note, context.state.answerNote);
         },
 
         setTrainerState(context, state: TrainerState){
@@ -67,6 +76,14 @@ const store = new Vuex.Store({
         
         setAnswerOptions(context, answerOptions : Array<NoteData>){
             context.commit('SET_ANSWER_OPTIONS', answerOptions);
+        },
+
+        addWrongChoice(context, wrongNote: NoteData){
+            context.commit('ADD_WRONG_CHOICE', wrongNote);
+        },
+
+        clearWrongChoices(context){
+            context.commit('CLEAR_WRONG_CHOICES');
         }
     },
 
@@ -81,5 +98,7 @@ NoteTrainerService.answerNoteChanged = (answerNote: NoteData) => store.dispatch(
 NoteTrainerService.answerOptionsChanged = (answerOptions: Array<NoteData>) => store.dispatch("setAnswerOptions", answerOptions);
 NoteTrainerService.timerChanged = (timer: number) => store.dispatch("setTrainerTimer", timer);
 NoteTrainerService.saveGuess = () => store.dispatch("saveGuess", null);
+NoteTrainerService.addWrongChoice = (wrongNote: NoteData) => store.dispatch("addWrongChoice", wrongNote);
+NoteTrainerService.clearWrongChoices = () => store.dispatch("clearWrongChoices");
 
 export default store;
