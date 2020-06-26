@@ -8,7 +8,7 @@ From the Azure Portal go to `Azure Active Directory` > `App registrations` > `Ne
 
 - name: `fretboard_web` 
 - Authentication > Add a platform > SPA
-- Redirect URI: https://stfretboard.z33.web.core.windows.net/
+- Redirect URI: https://stwebfretboard.z33.web.core.windows.net/
 - Implict grant: ID tokens, Access Tokens
 
 - name: `fretboard_api`
@@ -24,13 +24,16 @@ The below assumes you have installed:
 - Azure Powershell Module
 - AzCopy
 
-Update (deploy.ps1)[/deploy.ps1] and set the variables `$name`, `$location`, `$aadApiClientId`  
-From PowerShell navigate to the root of the repo and execute `./deploy.ps1`
+Update [deploy.ps1](/deploy.ps1) and set the variables `$name`, `$location`, `$aadApiClientId`  
+From PowerShell navigate to the root of the repo and execute  
+```
+./deploy.ps1
+```
 
 This script can be used to create/update the deployment. It does the following.
 
 - Creates the resource group
-- Deploys the (azuredeployjson)[/azuredeploy.json] ARM Template
+- Deploys the [azuredeployjson](/azuredeploy.json) ARM Template
 - Builds, publishes and zip deploys the .NET Function app
 - Builds and `azcopy` the Vue SPA front end
 
@@ -58,14 +61,15 @@ Create a Function App
 - Allowed Token Audience = AAD `fretboard_api`'s Application ID URI (Should be the same url the function app)
 - OK then Save!
 - CORS > Add the URL of the SPA application
+- To App Settings add `TableStorageConnection` with the value of a connection strign to the stdatafretboard storage account.
 
 ## Deploying static website to blob storage
-Install azcopy and add to Vironemtn Variables PATH. Navigate to the root folder.
+Install azcopy and add location to Environment Variables `PATH`. Navigate to the root folder.
 - Storage account > Access control: Give the user 'Storage Blob Data Contributor' role
 Once you've logged in you may need to wait a few minutes for the above permission change to take effect before copying the files
 ```
 azcopy login --tenant-id=a061aca6-27f7-48ab-81c8-172f7bc9f4e9
-azcopy copy 'dist/*' 'https://stfretboard.blob.core.windows.net/$web' --recursive
+azcopy copy 'dist/*' 'https://stwebfretboard.blob.core.windows.net/$web' --recursive
 ```
 
 ## Deploying Function App

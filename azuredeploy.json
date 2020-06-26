@@ -13,8 +13,12 @@
             "defaultValue": "fn-fretboard",
             "type": "String"
         },
-        "storageAccountName": {
-            "defaultValue": "stfretboard",
+        "webStorageAccountName": {
+            "defaultValue": "stwebfretboard",
+            "type": "String"
+        },
+        "dataStorageAccountName": {
+            "defaultValue": "stdatafretboard",
             "type": "String"
         },
         "aadApiClientId": {
@@ -46,7 +50,18 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[parameters('storageAccountName')]",
+            "name": "[parameters('webStorageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('dataStorageAccountName')]",
             "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS",
@@ -101,6 +116,10 @@
                             {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components', variables('applicationInsightsName')), '2018-05-01-preview').InstrumentationKey]"
+                            },
+                            {
+                            "name": "TableStorageConnection",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('dataStorageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('dataStorageAccountName')), '2019-06-01').keys[0].value)]"
                             }
                         ]
                 }
@@ -151,7 +170,7 @@
                         "https://functions.azure.com",
                         "https://functions-staging.azure.com",
                         "https://functions-next.azure.com",
-                        "[concat('https://', parameters('storageAccountName'), '.z33.web.core.windows.net')]"
+                        "[concat('https://', parameters('webStorageAccountName'), '.z33.web.core.windows.net')]"
                     ]
                 }
             }

@@ -4,11 +4,10 @@ namespace FretboardFunctions.Entities
 {
     public class AnswerDto
     {
-        public string UserId { get; set; }
-        public string Date { get; set; }
-        public int FretNo { get; set; }
-        public int StringNo { get; set; }
-        public int Attempts { get; set; }
-        public int TimeTaken { get; set; }
+        public int fretNo { get; set; }
+        public int stringNo { get; set; }
+        public string note { get; set; }
+        public int attempts { get; set; }
+        public int timeTaken { get; set; }
     }
 }

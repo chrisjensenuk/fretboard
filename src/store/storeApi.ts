@@ -80,9 +80,9 @@ export default class storeBackend extends VuexModule{
             requestConfig.headers =  { Authorization: `Bearer ${accessToken}` };
         }
         
-        axios.get(`${Config.functionAppUrl}api/test`, requestConfig)
+        axios.post(`${Config.functionAppUrl}api/answer`, answer, requestConfig)
         .then(function(response){
-            self.context.commit('SET_RESPONSE', response.data)
+            self.context.commit('SET_RESPONSE', response.status)
         })
         .catch(function(error){
             console.log(error);

@@ -8,41 +8,51 @@ using System.IO;
 using FretboardFunctions.TableEntities;
 using FretboardFunctions.Entities;
 using Microsoft.Azure.Cosmos.Table;
+using System.Security.Claims;
+using System.Linq;
+using System;
 
 namespace FretboardFunctions
 {
     public static class AnswerPost
     {
-        /*
-        {
-	        "UserId" : "userid",
-	        "Date" : "2020-08-08T15:39",
-	        "FretNo" : 0,
-	        "StringNo" : 0,
-	        "Attempts" : 1,
-	        "TimeTaken" : 1234
-        }
-        */
         [FunctionName("answer")]
         public static async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            [Table("answer")] CloudTable guessTable,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
+            [Table("answer", Connection = "TableStorageConnection")] CloudTable guessTable,
+            ILogger log,
+            ClaimsPrincipal claimsPrincipal)
         {
-            //todo: save ip address & a unique session id (created client side on page load)
-            //if user is logged in then save agsitn the user's cn
-            
+#if DEBUG
+            claimsPrincipal = await OpenIdConnectLocal.GetClaimsPrincipal(req);
+            req.Headers.Add("X-Forwarded-For", "192.168.0.1:123456");
+#endif
+
             var body = await new StreamReader(req.Body).ReadToEndAsync();
             var answerDto = System.Text.Json.JsonSerializer.Deserialize<AnswerDto>(body);
 
+            string userId = null;
+            
+            if (claimsPrincipal.Identity.IsAuthenticated)
+            {
+                userId = claimsPrincipal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            }
+
+            var clientIp = (req.Headers["X-Forwarded-For"].FirstOrDefault() ?? "").Split(':').FirstOrDefault();
+
+            var now = DateTime.UtcNow;
+
             var answer = new Answer
             {
-                PartitionKey = answerDto.UserId,
-                RowKey = answerDto.Date,
-                FretNo = answerDto.FretNo,
-                StringNo = answerDto.StringNo,
-                Attempts = answerDto.Attempts,
-                TimeTaken = answerDto.TimeTaken
+                PartitionKey = userId ?? now.ToString("yyyy-MM-dd"),
+                RowKey = now.ToString("o"),
+                ClientIp = clientIp,
+                FretNo = answerDto.fretNo,
+                StringNo = answerDto.stringNo,
+                Note = answerDto.note,
+                Attempts = answerDto.attempts,
+                TimeTaken = answerDto.timeTaken,
+                InsertedOn = now
             };
 
             try
