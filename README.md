@@ -13,7 +13,7 @@ Plan - Consumption Plan
 .NET Core 3.1 (Windows)  
 
 ### Storage Accounts
-1. Storage account to support the function app - `stfnfretboard` (V1 - cheaper for behind the scences function workings)  
+1. Storage account to support the function app - `stfnfretboard` (V1 - cheaper for behind the scenes function workings)  
 2. Storage account to host static content - `stwebfretboard` (V2)  
 3. Storage account for application data and queues - `stdatafretboard` (V2)
 
